@@ -1,0 +1,8 @@
+<GetLiveDataResult 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns="http://energy.ge.com/WindSCADA/">
+    <LiveData Status="true" Msg="WINDSDISERVERCONNGAIN" RTServerTime="1517712702997" Offset="19800000">
+        <I d="1.1303,0,0,2"/>
+    </LiveData>
+</GetLiveDataResult>

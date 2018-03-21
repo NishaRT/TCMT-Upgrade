@@ -1,0 +1,11 @@
+{
+    "TOTAL": "Total",
+    "ONLINE": "Online",
+    "AVAILABLE": "Available",
+    "IMPACTED": "Impacted",
+    "TRIPPED": "Tripped",
+    "STOPPED": "Stopped",
+    "NODATA": "No Data",
+    "Site Power": "Site Power",
+    "Site Wind Speed": "Site Wind Speed"
+}

@@ -1,0 +1,17 @@
+---
+applications:
+  - name: TCMT-Upgrade-integration
+    memory: 512M
+    buildpack: https://github.com/cloudfoundry/nodejs-buildpack.git
+    
+  #services:
+ # - <your-name>-secure-uaa-instance
+ # - <your-name>-timeseries-instance
+ # - <your-name>-asset-instance
+
+    #uaa_service_label : predix-uaa
+    # Add these values for authentication in the cloud
+    #clientId: renewableenergy_tcmtqa_dev
+  #  base64ClientCredential: cmVuZXdhYmxlZW5lcmd5X3RjbXRxYV9kZXY6RjJ2Mk55RldrSlQybkdHMA==
+  #  uaaURL: https://a8a2ffc4-b04e-4ec1-bfed-7a51dd408725.predix-uaa.run.aws-usw02-pr.ice.predix.io
+    #windServiceURL: ""
