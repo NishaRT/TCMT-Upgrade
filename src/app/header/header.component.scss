@@ -1,0 +1,132 @@
+@import "~styles/colors";
+
+.header {
+  @include themify($themes) {
+    background-color: themed('header-background'); 
+    color: themed('header-foreground'); 
+  }
+    font-size: 18px;
+    padding: 0px 0px;
+  }
+  
+  .header-logo img {
+    height: 45px;
+    width: 45px;
+  }
+
+  .info {
+    @include themify($themes) {
+      color: themed('header-info-foreground'); 
+    }
+    margin-right: 10px;
+    
+  }
+  
+  .userLoginInfo {
+    font-size: 11px;
+    padding: 0px 0px 5px 0px;
+  }
+
+  .welcome{
+    font-size: 14px;
+    @include themify($themes) {
+      color: themed('header-info-foreground'); 
+    }
+  }
+  .username{
+    font-size: 16px;
+    margin: 5px 5px;
+  }
+
+  .role{
+    font-size: 11px;
+   margin-right:10px;
+   @include themify($themes) {
+    color: themed('header-info-foreground'); 
+  }
+  }
+  
+  .userLoginInfo div p {
+    float: left;
+    margin-bottom: 0px;
+  }
+  
+  .parkname {
+    font-size: 13px;
+  }
+  
+  row sup {
+    font-size: 10px;
+  }
+  
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 20px;
+  }
+  
+  .switch input {display:none;}
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(40px);
+    -ms-transform: translateX(40px);
+    transform: translateX(40px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+
+  @media only screen and (max-width: 768px) {
+    .header {
+      font-size: 14px;
+    }
+    .header-logo {
+      text-align: center;
+    }
+    .serverTime,
+    .serverTime p {
+      float: left !important;
+      margin-top: 0;
+    }
+  }
+  

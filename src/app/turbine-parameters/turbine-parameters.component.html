@@ -1,0 +1,35 @@
+<div class="flex" >
+
+    <div >
+Hello {{selectedSystem?.Name}}
+<i class="fa fa-bars" id="sidebarCollapse" style="font-size:18px;margin:0px 15px 0px 15px;" (click)="onOpenSideBarClick()"></i>
+    </div>
+        <div class="wrapper">
+                <nav id="turbine-sidebar" [ngClass]="{'active': isSideBarOpened}">
+        
+                    <div class="turbine-sidebar-header" style="display:flex;">
+                        <div id="searchBoxDiv" style="display:flex; flex:1;">
+                            <input type="search" placeholder="Search" [(ngModel)]="searchText">
+                        </div>
+                        <div id="turbine-dismiss" (click)="onOverLayClick()">
+                            <i class="fa fa-arrow-left"></i>
+                        </div>
+                    </div>
+                    
+                   
+                    <ul class="list-unstyled components">
+                        <li *ngFor="let system of systemsData | filter : searchText : 'Name'">
+                            <a (click)="onSysClick(system)" style="display:flex; align-items:center">
+                                <div class="ellipse" [ngClass]="system.Status+'' | TurbineStatus"></div>
+                                <span>{{system.Name}}</span>
+                            </a>
+                        </li>
+                    </ul>
+        
+                </nav>
+        
+            </div>
+            <div class="turbine-overlay" (click)="onOverLayClick()" [ngClass]="{'turbine-overlay-show': isSideBarOpened, 'turbine-overlay-hide': !isSideBarOpened}"></div>
+
+
+</div>

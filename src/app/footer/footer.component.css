@@ -1,0 +1,10 @@
+.footer {
+    font-family: Arial, sans-serif;
+    font-size: 7pt;
+ 
+    color: black;
+    display:table;
+    text-align:center;
+    width:300px;
+    margin: 0 auto;
+}

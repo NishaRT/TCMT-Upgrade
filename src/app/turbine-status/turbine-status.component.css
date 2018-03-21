@@ -1,0 +1,16 @@
+.status {
+    font-size:2.5vmin;
+ }
+ 
+ .value {
+     font-size: 6.7vmin;
+     /* margin-top: 15px; */
+     text-align: center;
+ }
+
+ .divStatus{
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+ }

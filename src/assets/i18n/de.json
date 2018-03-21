@@ -1,0 +1,11 @@
+{
+    "TOTAL": "Gesamt",
+    "ONLINE" : "Dabba",
+    "AVAILABLE": "Verfügbar",
+    "IMPACTED" : "Beeinflusst",
+    "TRIPPED" :"Ausgelöst",
+    "STOPPED" :"Gestoppt",
+    "NODATA" : "Keine Daten",
+    "Site Power": "Leistung",
+    "Site Wind Speed": "Windgeschwindigkeit"
+}

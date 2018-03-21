@@ -1,0 +1,49 @@
+<body>
+<div #parentDiv style=" background-color: rgb(250, 250, 250); flex-direction: column;min-height:100vh; " [ngClass]="{'showDiv':isLoaded, 'hideDiv': !isLoaded, 'theme-dark':isBlackThemeSelected, 'theme-light':!isBlackThemeSelected}">
+    <header>
+        <header-comp (showSideBar)="onOpenSideBarClick()" [locales]="locales" (localeChange)="onLocaleChange($event)" (isBlackThemeSelected)="onThemeChange($event)" ></header-comp>
+    </header>
+    <main style="flex:1; display:flex;">
+        <router-outlet></router-outlet>
+    </main>
+
+    <div class="wrapper">
+        <nav id="sidebar" [ngClass]="{'active': isSideBarOpened}">
+            <div id="dismiss" (click)="onOverLayClick()">
+                <i class="fa fa-arrow-left"></i>
+            </div>
+
+            <div class="sidebar-header">
+                <h3>Adelaide</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li *ngFor="let menu of menuItems">
+                    <a routerLink="{{menu.href}}">
+                        <i class={{menu.icon}}></i>
+                        <span>{{menu.Name}}</span>
+                    </a>
+                </li>
+            </ul>
+
+        </nav>
+
+    </div>
+    <div class="overlay" (click)="onOverLayClick()" [ngClass]="{'overlay-show': isSideBarOpened, 'overlay-hide': !isSideBarOpened}"></div>
+    <footer>
+        <span class="float-right" style="font-size: x-small;margin-right:5px;">
+            <i class="fa fa-copyright"></i>
+            2009 to the present. General Electric Company.
+        </span>
+    </footer>
+</div>
+<div id="appSplash" class="appSplash theme-dark" style="flex-direction: row;" [ngClass]="{'showDiv': !isLoaded, 'hideDiv': isLoaded, 'theme-dark':isBlackThemeSelected, 'theme-light':!isBlackThemeSelected}">
+    <div class="appInfo">
+    <div style="display:flex;flex-direction: column;height:25vh;justify-content:center;">
+        <div class="windSCADA">Turbine Configuration Management</div>
+        <div class="currentloadStatus">{{currentStatus}}</div>
+    </div>
+</div>
+<div class="appImage"></div>
+</div>
+</body>

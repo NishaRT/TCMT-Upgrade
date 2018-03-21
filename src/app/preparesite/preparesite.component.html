@@ -1,0 +1,93 @@
+<div class="container-fluid">
+    <div class="pull-right">
+        <button type="button" [disabled]="!selectedTurbineTypesForPush.length" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#fileExplorer" id="select1-button" (click)="callGetFilesInFolder()">Choose Files</button>
+        <button type="button" [disabled]="!selectedTurbineTypesForPush.length" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#confirmationBox" id="upload-button" value="upload"><i class="fa fa-upload fa-lg"></i> Push to Site</button>
+    </div>
+
+    <div *ngIf="prepareSiteTableData; else dataTableBusy" class="container-fluid m-t-sm"  style='float:left;width:100%'>
+        <ngx-datatable
+        style="width: 100%"
+        class="material"
+        [rows]="ngxRows"
+        [columnMode]="'standard'"
+        [headerHeight]="50"
+        [rowHeight]="'auto'"
+        [limit]="5"
+        [columns] = "columns"
+        [displayCheck]="displayCheck"
+        [selectionType]="'checkbox'"
+        (select)='onCheckboxChange($event)'>
+            <ngx-datatable-column
+            [width]="30"
+            [sortable]="false"
+            [canAutoResize]="false"
+            [draggable]="false"
+            [resizeable]="false"
+            [headerCheckboxable]="true"
+            [checkboxable]="true">
+            </ngx-datatable-column>
+            <ngx-datatable-column [width]="300" prop="turbineType" name="Turbine type"></ngx-datatable-column>
+            <ngx-datatable-column [width]="300" prop="existingFiles" name="Control code package on Site Server"></ngx-datatable-column>
+            <ngx-datatable-column [width]="300" prop="fileChosen" name="Selected control code package"></ngx-datatable-column>
+            <ngx-datatable-column [width]="300" prop="uploadStatus" name="Upload Status"></ngx-datatable-column>
+        </ngx-datatable>
+    </div>
+</div>
+
+<ng-template #dataTableBusy>Fetching Data</ng-template>
+
+
+<!-- Modal -->
+<div class="modal fade" id="fileExplorer" tabindex="-1" role="dialog" aria-labelledby="fileExplorerLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Available Control code release package</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+             <div *ngIf="finalFiles; else elseBlock">
+                 <b>1.xx :</b>
+                <div *ngIf='finalFiles["1x"]'>
+                    <div class="radio" *ngFor='let obj of finalFiles["1x"]'>
+                        <input type="radio" value={{obj.name}} name="available_files_1x" (change)="updateRowWithoutDeletion(obj.turbineType, null, obj.name, null)"> {{obj.name}}
+                    </div>
+                </div>
+                <br>
+                <div *ngIf='finalFiles["2x"]'>
+                    <b>2.xx : </b>
+                    <div class="radio" *ngFor='let obj of finalFiles["2x"]'>
+                        <input type="radio" value={{obj.name}} name="available_files_2x" (change)="updateRowWithoutDeletion(obj.turbineType, null, obj.name, null)"> {{obj.name}}
+                    </div>
+                </div>
+            </div>
+            <ng-template #elseBlock>
+                <div align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
+            </ng-template>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Select</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="confirmationBox" tabindex="-1" role="dialog" aria-labelledby="confirmationBoxLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to push selected files to {{selectedParkName}}?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="startPushToSite()">Yes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+            </div>
+          </div>
+        </div>
+    </div>

@@ -1,0 +1,61 @@
+<body>
+<div class="pull-right">
+    <button [disabled]="!selectedTurbinesForUpgrade.length" type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#upgradeConfirmationBox" id="upgrade-button" value="upgrade"><i class="fa fa-arrow-circle-up fa-lg"></i> Upgrade</button>
+</div>
+
+<div class="container-fluid m-t-sm"  style='float:left;width:100%'>
+<ngx-datatable
+    style="width: 100%"
+    class="material"
+    [rows]="ngxRows"
+    [columnMode]="standard" 
+    [headerHeight]="50"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [limit]="10"
+    [columns] = "columns"
+    [selectionType]="'checkbox'"
+    (select)='onCheckboxChange($event)'>
+    <ngx-datatable-column [width]=10 prop="spinner" name=""></ngx-datatable-column>
+        <ngx-datatable-column
+        [width]="30"
+        [sortable]="false"
+        [canAutoResize]="false"
+        [draggable]="false"
+        [resizeable]="false"
+        [headerCheckboxable]="true"
+        [checkboxable]="true">
+        </ngx-datatable-column>
+        <ngx-datatable-column [width]=110 prop="name" name="Name"></ngx-datatable-column>
+        <ngx-datatable-column [width]=125 prop="systemNumber" name="Sys. Number"></ngx-datatable-column>
+        <ngx-datatable-column [width]=125 prop="ipAddress" name="IP"></ngx-datatable-column>
+        <ngx-datatable-column [width]=125 prop="turbineStatus" name="Turbine Status"></ngx-datatable-column>
+        <ngx-datatable-column [width]=125 prop="swVersion" name="Current Ver."></ngx-datatable-column>
+        <ngx-datatable-column [width]=100 prop="ramSize" name="RAM Size"></ngx-datatable-column>
+        <ngx-datatable-column [width]=125 prop="cfc0Size" name="Total CFC0 Size"></ngx-datatable-column>
+        <ngx-datatable-column [width]=125 prop="taskVersion" name="Backup Ver."></ngx-datatable-column>
+        <ngx-datatable-column [width]=125 prop="lastTaskRunTime" name="Upgrade Time"></ngx-datatable-column>
+        <ngx-datatable-column [width]=110 prop="progress" name="Upgrade Status"></ngx-datatable-column>
+    </ngx-datatable>
+</div>
+</body>
+
+
+
+<div class="modal fade" id="upgradeConfirmationBox" tabindex="-1" role="dialog" aria-labelledby="upgradeConfirmationBoxLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to upgrade <b>{{selectedTurbinesForUpgrade.length}}</b> selected turbine(s)?
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="sendUpgradeCommand()">Yes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        </div>
+      </div>
+    </div>
+</div>  

@@ -1,0 +1,11 @@
+{
+    "TOTAL": "總",
+    "ONLINE": "線上",
+    "AVAILABLE": "可得到",
+    "IMPACTED": "受影響",
+    "TRIPPED": "脫扣",
+    "STOPPED": "停止",
+    "NODATA": "沒有數據",
+    "Site Power": "現場電源",
+    "Site Wind Speed": "現場風速"
+}

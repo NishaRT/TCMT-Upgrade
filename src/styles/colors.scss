@@ -1,0 +1,135 @@
+$themes :(
+dark :(
+/*** GENERIC COLORS ***/
+text-foreground: #ffffff,
+text-foreground-onhover: #000000,
+text-background-onhover: #ffffff,
+
+/*** GENERIC COLORS END ***/
+
+/**** APP SPLASH COLORS ***/
+appsplash-background: #ffffff,
+/**** APP SPLASH COLORS END***/
+
+
+/**** SIDE BAR COLORS ****/
+
+sidebar-background:#1c313a,
+sidebar-header-background:#102027,
+sidebar-dismiss-hover:#7386D5,
+
+/**** SIDE BAR COLORS  END ****/
+
+
+/***** HEADER COLORS ****/
+header-background:#102027,
+header-foreground:#ffffff,
+header-info-foreground:#cccccc,
+/***** HEADER COLORS END****/
+
+turbine-status-nodata-gradient1: white,
+turbine-status-nodata-gradient2: rgba(235, 235, 235, 1),
+turbine-status-nodata-gradient3: #abababFF,
+
+turbine-status-online-gradient1 : white,
+turbine-status-online-gradient2 :#5ACE52,
+turbine-status-online-gradient3 :#17BC0B,
+
+turbine-status-impacted-gradient1: white,
+turbine-status-impacted-gradient2: #D8E27A,
+turbine-status-impacted-gradient3: #9DA83C,
+
+turbine-status-stopped-gradient1: white,
+turbine-status-stopped-gradient2: #E59812,
+turbine-status-stopped-gradient3: #B2750C,
+
+turbine-status-tripped-gradient1: white,
+turbine-status-tripped-gradient2: #990000,
+turbine-status-tripped-gradient3: #8b0000,
+
+turbine-status-available-gradient1: white,
+turbine-status-available-gradient2: #2A77BF,
+turbine-status-available-gradient3: #0F5596,
+
+
+turbine-status-border : black
+
+
+),
+
+light:(
+    /*** GENERIC COLORS ***/
+    text-foreground: #000000,
+    text-foreground-onhover: #ffffff,
+    text-background-onhover: #000000,
+    
+    /*** GENERIC COLORS END ***/
+    
+    /**** APP SPLASH COLORS ***/
+    appsplash-background: #000000,
+    /**** APP SPLASH COLORS END***/
+    
+    
+    /**** SIDE BAR COLORS ****/
+    
+    sidebar-background:#f5ebeb,
+    sidebar-header-background:#56bce7,
+    sidebar-dismiss-hover:rgb(215, 218, 228),
+    
+    /**** SIDE BAR COLORS  END ****/
+
+
+    /***** HEADER COLORS ****/
+    header-background:#a2d1e6,
+    header-foreground:#130303,
+    header-info-foreground:#cccccc,
+    /***** HEADER COLORS END****/
+
+
+    turbine-status-nodata-gradient1: white,
+    turbine-status-nodata-gradient2: #EBEBEBFF,
+    turbine-status-nodata-gradient3: #ABABABFF,
+
+    turbine-status-online-gradient1 : white,
+    turbine-status-online-gradient2 :#5ACE52,
+    turbine-status-online-gradient3 :#17BC0B,
+
+    turbine-status-impacted-gradient1: white,
+    turbine-status-impacted-gradient2: #D8E27A,
+    turbine-status-impacted-gradient3: #9DA83C,
+
+    turbine-status-stopped-gradient1: white,
+    turbine-status-stopped-gradient2: #E59812,
+    turbine-status-stopped-gradient3: #B2750C,
+
+    turbine-status-tripped-gradient1: white,
+    turbine-status-tripped-gradient2: #990000,
+    turbine-status-tripped-gradient3: #8b0000,
+
+    turbine-status-available-gradient1: white,
+    turbine-status-available-gradient2: #2A77BF,
+    turbine-status-available-gradient3: #0F5596,
+    
+    turbine-status-border : #8D8D8D
+
+)
+);
+
+
+@mixin themify($themes) {
+    @each $theme, $map in $themes {
+      .theme-#{$theme} & {
+        $theme-map: () !global;
+        @each $key, $submap in $map {
+          $value: map-get(map-get($themes, $theme), '#{$key}');
+          $theme-map: map-merge($theme-map, ($key: $value)) !global;
+        }
+        @content;
+        $theme-map: null !global;
+      }
+    }
+  }
+  
+  @function themed($key) {
+    @return map-get($theme-map, $key);
+  }

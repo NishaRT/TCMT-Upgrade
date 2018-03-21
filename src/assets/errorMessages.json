@@ -1,0 +1,26 @@
+{
+    "timeOutMessages" : {
+        "GetListOfWindFarms" : "Request timed out while fetching Sites list, Please try again",
+        "GetListOfWindTurbines" : "Request timed out while fetching Turbines list, Please try again",
+        "DownloadFilesStatus" : "Request timed out while fetching existing files list, Please try again",
+        "Backup" : "Request timed out while backing up turbines, Please try again",
+        "BackupStatus" : "Request timed out while fetching backup status of turbines, Please try again",
+        "GetFilesInFolder" : "Request timed out while fetching files list, Please try again",
+        "DownloadFiles" : "Request timed out while pushing files list, Please try again",
+        "GetVariableStatusWithTime" : "Request timed out while fetching salt key, Please try again",
+        "GetStatus" : "Request timed out while fetching salt key, Please try again",
+        "GetTurbineInfo" : "Request timed out while fetching turbine internal details, Please try again",
+        "Upgrade" : "Request timed out while upgrading turbines, Please try again",
+        "UpgradeStatus" : "Request timed out while fetching upgrade status of turbines, Please try again"
+    },
+
+    "errorCodeMessages" : {
+        "NUCLEUS_SENDCOMMANDEDGE_FAILED" : "Unable to reach controller, Please try again later.",
+        "SEND_COMMANDEDGE_FAILED" : "Unable to reach controller, Please try again later.",
+        "NUCLEUS_UNKNOWNERROR" : "An error occured in controller, Please try again later.",
+        "HTTP_RESPONSE_ERROR, null response" : "Invalid Site IP address, Please verify.",
+        "invalid_token" : "Your session has expired, Page will be refreshed"
+    }
+
+
+}

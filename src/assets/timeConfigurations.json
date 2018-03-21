@@ -1,0 +1,27 @@
+[
+    {
+        "id" : "default",
+        "timeOut": 1800000,
+        "interval" : 3000
+    },
+    
+    {
+        "id" : "GetListOfWindFarms",
+        "timeOut": 180000,
+        "interval" : 5000
+    },
+
+    {
+        "id" : "GetListOfWindTurbines",
+        "timeOut": 180000,
+        "interval" : 3000
+    },
+
+    {
+        "id" : "DownloadFilesStatus",
+        "timeOut": 120000,
+        "interval" : 3000
+    }
+
+    
+]

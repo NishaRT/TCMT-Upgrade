@@ -1,0 +1,82 @@
+<body>
+<div class="pull-right">
+    <button [disabled]="!selectedTurbinesForRestore.length" type="button" class="btn btn-dark btn-sm m-r-md" id="restore-button" value="restore" data-toggle="modal" data-target="#restoreConfirmationBox"><i class="fa fa-history fa-lg"></i> Restore</button>
+</div>
+<div class="container-fluid m-t-sm"  style='float:left;width:100%'>
+        <div *ngIf="isDataAvailable">
+            <ngx-datatable
+        style="width: 100%"
+        class="material"
+        [rows]="ngXRows"
+        [columnMode]="standard" 
+        [headerHeight]="50"
+        [footerHeight]="50"
+        [rowHeight]="'auto'"
+        [limit]="10"
+        [columns] = "columns"
+        [selectionType]="'checkbox'"
+        (select)='onCheckboxChange($event)'>
+        <ngx-datatable-column [width]=10 prop="spinner" name=""></ngx-datatable-column>
+            <ngx-datatable-column
+            [width]="30"
+            [sortable]="false"
+            [canAutoResize]="true"
+            [draggable]="false"
+            [resizeable]="false"
+            [headerCheckboxable]="true"
+            [checkboxable]="true">
+            </ngx-datatable-column>
+            <ngx-datatable-column [width]=110 prop="name" name="Name"></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="systemNumber" name="Sys. Number"></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="ipAddress" name="IP">
+              <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+                  <span
+                    title="Double click to edit"
+                    (dblclick)="editing[rowIndex + '-ip'] = true"
+                    *ngIf="!editing[rowIndex + '-ip']">
+                    {{value}}
+                  </span>
+                  <input
+                    autofocus
+                    (blur)="updateViaInline($event, 'ip', rowIndex)"
+                    *ngIf="editing[rowIndex+ '-ip']"
+                    type="text"
+                    [value]="value"
+                  />
+                </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="turbineStatus" name="Turbine Status"></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="currentVersion" name="Current Ver."></ngx-datatable-column>
+            <ngx-datatable-column [width]=100 prop="ramSize" name="RAM Size"></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="cfc0Size" name="Total CFC0 Size"></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="backupVersion" name="Backup Ver."></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="restoreTime" name="Restore Time"></ngx-datatable-column>
+            <ngx-datatable-column [width]=110 prop="retoreStatus" name="Restore Status"></ngx-datatable-column>
+        </ngx-datatable>
+        </div>
+        <div *ngIf="!isDataAvailable">
+            <p><i class="fa fa-spinner fa-spin" style="font-size:24px"></i>
+                &nbsp;&nbsp; Please wait while data is loading
+                </p>
+        </div>
+    </div>
+
+</body>
+
+<div class="modal fade" id="restoreConfirmationBox" tabindex="-1" role="dialog" aria-labelledby="restoreConfirmationBoxLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to restore <b>{{selectedTurbinesForRestore.length}}</b> selected turbine(s)?
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="sendRestoreCommand()">Yes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+        </div>
+      </div>
+    </div>
+</div>

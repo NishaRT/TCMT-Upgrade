@@ -1,0 +1,257 @@
+@import "~styles/colors";
+html,
+body {
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.flex {
+    display: flex;
+    flex: 1;
+}
+
+.showDiv {
+    display: flex;
+}
+
+.hideDiv {
+    display: none;
+}
+
+.appSplash {
+    margin: auto;
+    width: 90vh;
+    height: 30vh;
+    font-size: 1.2em;
+    box-shadow: 0px 0px 50px #ccc;
+    -moz-box-shadow: 0px 0px 50px #ccc;
+    -webkit-box-shadow: 0px 0px 50px #ccc;
+    border-radius: 3px 3px 3px 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+.appInfo {
+    margin: auto;
+    width: 90vh;
+    height: 30vh;
+    padding: 18px 56px;
+    font-size: 1.2em;
+    @include themify($themes) {
+        background-color: themed('appsplash-background'); // background-image:  url('../assets/img/turbine.gif') no-repeat top right;
+    } //background-size: 50%;
+}
+
+.appImage {
+    margin: auto;
+    width: 90vh;
+    height: 30vh;
+    @include themify($themes) {
+        background: url('../assets/img/turbine.gif') no-repeat top right;
+        background-size: cover;
+    }
+}
+
+.windSCADA {
+    font-size: x-large
+}
+
+.currentloadStatus {
+    font-size: x-small;
+}
+
+
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+
+#sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100vh;
+    z-index: 999;
+    @include themify($themes) {
+        background-color: themed('sidebar-background');
+    }
+    color: #fff;
+    transition: all 0.3s;
+    overflow-y: auto;
+    box-shadow: 3px 3px 3px rgba(0,
+    0,
+    0,
+    0.2);
+}
+
+#sidebar.active {
+    left: 0;
+}
+
+#dismiss {
+    width: 35px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    -webkit-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+#dismiss:hover {
+    /* background: #fff; */
+    @include themify($themes) {
+        color: themed('sidebar-dismiss-hover');
+    }
+}
+
+.overlay-hide {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 998;
+    display: none;
+}
+
+.overlay-show {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 998;
+    display: block;
+}
+
+#sidebar .sidebar-header {
+    padding: 15px;
+    /* background: #1e1e1e; */
+    @include themify($themes) {
+        background-color: themed('sidebar-header-background');
+    }
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    /* border-bottom: 1px solid #47748b; */
+}
+
+#sidebar ul p {
+    @include themify($themes) {
+        color: themed('text-foreground');
+    }
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+}
+
+#sidebar ul li a i {
+    margin: 5px;
+    width: 25px;
+}
+
+a,
+a:hover,
+a:focus {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+#sidebar ul li a:hover {
+    @include themify($themes) {
+        color: themed('text-foreground-onhover');
+        background: themed('text-background-onhover');
+    }
+}
+
+a[data-toggle="collapse"] {
+    position: relative;
+}
+
+a[aria-expanded="false"]::before,
+a[aria-expanded="true"]::before {
+    content: '\e259';
+    display: block;
+    position: absolute;
+    right: 20px;
+    font-family: 'fa fa-chevron-down';
+    font-size: 0.6em;
+}
+
+a[aria-expanded="true"]::before {
+    content: '\e260';
+}
+
+ul ul a {
+    font-size: 0.9em !important;
+    padding-left: 30px !important;
+}
+
+
+/* ---------------------------------------------------
+    CONTENT STYLE
+----------------------------------------------------- */
+
+#content {
+    width: 100%;
+    padding: 20px;
+    min-height: 100vh;
+    transition: all 0.3s;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+
+/* ---------------------------------------------------
+   Turbine Status Style
+----------------------------------------------------- */
+
+.turbineStatusNoData{
+    @include themify($themes) {
+    background: radial-gradient(themed('turbine-status-nodata-gradient3'),themed('turbine-status-nodata-gradient2'),themed('turbine-status-nodata-gradient1'));
+    }
+}
+
+.turbineStatusOnline{
+    @include themify($themes) {
+        background: radial-gradient(themed('turbine-status-online-gradient3'),themed('turbine-status-online-gradient2'),themed('turbine-status-online-gradient1'));
+        }
+}
+
+.turbineStatusImpacted{
+    @include themify($themes) {
+        background: radial-gradient(themed('turbine-status-impacted-gradient3'),themed('turbine-status-impacted-gradient2'),themed('turbine-status-impacted-gradient1'));
+        }
+}
+
+.turbineStatusStopped{
+    @include themify($themes) {
+        background: radial-gradient(themed('turbine-status-stopped-gradient3'),themed('turbine-status-stopped-gradient2'),themed('turbine-status-stopped-gradient1'));
+        }
+}
+
+.turbineStatusTripped{
+    @include themify($themes) {
+        background: radial-gradient(themed('turbine-status-tripped-gradient3'),themed('turbine-status-tripped-gradient2'),themed('turbine-status-tripped-gradient1'));
+        }
+}
+
+.turbineStatusAvailable{
+    @include themify($themes) {
+        background: radial-gradient(themed('turbine-status-available-gradient3'),themed('turbine-status-available-gradient2'),themed('turbine-status-available-gradient1'));
+        }
+}
+
+/* ---------------------------------------------------
+  End of Turbine Status Style
+----------------------------------------------------- */

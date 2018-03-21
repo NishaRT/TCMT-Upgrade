@@ -1,0 +1,6 @@
+<div class = "m-t-sm container-fluid">
+    Site: <select (change)="selectedSite($event.target)" id="sites-dropdown">
+            <option value="" >Select a Site</option>
+            <option *ngFor="let site of allSites" value={{site.parkId}} id={{site.parkId}}>{{site.parkName}} </option>
+          </select>
+</div>

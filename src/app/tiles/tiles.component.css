@@ -1,0 +1,42 @@
+.tab-content{
+    height: 50px;
+}
+
+.bg-black{
+    background-color: black;
+}
+
+.white-text{
+    color: white;
+}
+
+.first-tab-pane{
+    padding-bottom: 43px;
+}
+
+.second-tab-pane{
+    padding-bottom: 20px;
+}
+
+.tab-head{
+    max-height: 5rem;
+    max-width: 20rem;
+}
+
+.quick-info{
+    font-size: 11px;
+}
+
+.icon-container{
+    padding-left: 25px;
+}
+
+a.active{
+    background-color: #03A9F4 !important;
+    box-shadow: 0px 2px 20px #080808;
+}
+
+a:hover {
+    background-color: #03A9F4 !important;
+    box-shadow: 0px 2px 20px #080808;
+}

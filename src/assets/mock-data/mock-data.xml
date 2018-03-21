@@ -1,0 +1,49 @@
+<Menu>
+    <MenuItem Name="Home" icon="fa fa-home" href="/home" canDeactivate="CanDeactivateService" component="DynamicComponent">
+        <Screen class="flex flex-column">
+            <group class="flex-row" order="1">
+                <group class="flex-column" order="1" style="margin: 5px 10px;">
+                    <HighlevelSignalComponent class="flex" order="1">
+                        <templateData>
+                            <!-- <signalName>Site Power</signalName><signalValue>15.3</signalValue><unitsValue>MW</unitsValue> -->
+                            <dataPointId>1.11651</dataPointId>
+                        </templateData>
+                    </HighlevelSignalComponent>
+                    <HighlevelSignalComponent class="flex" order="2">
+                        <templateData>
+                            <!-- <signalName>Site Wind Speed</signalName><signalValue>5.2</signalValue><unitsValue>m/s</unitsValue> -->
+                            <dataPointId>1.1791</dataPointId>
+                        </templateData>
+                    </HighlevelSignalComponent>
+                </group>
+                <HighLevelAlarmComponent class="flex" style="margin: 5px 10px;" order="2"></HighLevelAlarmComponent>
+                <TurbineStatusComponent class="flex" style="margin: 5px 10px;flex:6;" order="3"></TurbineStatusComponent>
+            </group>
+            <group class="flex" style="flex:3" order="2">
+                <TurbinesGridComponent class="flex" style="margin: 5px 10px;" order="1">
+                    <templateData>
+                        <Signals>
+                            <Platform name="ESS">
+                                <Signal displayName="Turbine Status" dataPointId="16781"/>
+                                <Signal displayName="Power (kW)" dataPointId="1316"/>
+                                <Signal displayName="Wind Speed (m/s)" dataPointId="1319"/>
+                                <Signal displayName="Generator RPM" dataPointId="1303"/>
+                                <Signal displayName="Turbine Condition" dataPointId="16780"/>
+                            </Platform>
+                            <Platform name="BEC">
+                               <Signal displayName="Turbine Status" dataPointId="167813"/>
+                               <Signal displayName="Power (kW)" dataPointId="13163"/>
+                                <Signal displayName="Wind Speed (m/s)" dataPointId="13193"/>
+                                <Signal displayName="Generator RPM" dataPointId="13033"/>
+                                <Signal displayName="Turbine Condition" dataPointId="167803"/>
+                                </Platform>
+                        </Signals>
+                    </templateData>
+                </TurbinesGridComponent>
+            </group>
+        </Screen>
+    </MenuItem>
+    <MenuItem Name="Turbine Parameters" icon="fa fa-tachometer" href="/turbineParameters" canDeactivate="CanDeactivateService" component="TurbineParametersComponent"></MenuItem>
+    <MenuItem Name="Turbine Upgrade" icon="fa fa-area-chartr" href="/turbineUpgrade" canDeactivate="CanDeactivateService" component="TurbineUpgradeComponent"></MenuItem>
+    <!-- <MenuItem Name="Reports" icon="fa fa-area-chart" href="/reports"></MenuItem><MenuItem Name="Help" icon="fa fa-info-circle" href="/help"></MenuItem> -->
+</Menu>
