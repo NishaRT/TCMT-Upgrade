@@ -11,39 +11,15 @@ import {DataService} from '../services/data.service';
 })
 
 export class TilesComponent{
+    selectedTile = 1;
 
     constructor(private globalStorageService : GlobalStorageService, private dataService : DataService) {
 
     }
 
     onTileSelect(val) {
-      console.log("Inside OnTileSelect",val);
         this.globalStorageService.setSelectedTile(val);
-
-        switch(val){
-            case 1 :
-                clearInterval(this.globalStorageService.getBackupStatusPollingId());
-                clearInterval(this.globalStorageService.getUpgradeStatusPollingId());
-                clearInterval(this.globalStorageService.getRestoreStatusPollingId());
-                break;
-
-            case 2 :
-                clearInterval(this.globalStorageService.getPrepareSitePollingId());
-                clearInterval(this.globalStorageService.getUpgradeStatusPollingId());
-                clearInterval(this.globalStorageService.getRestoreStatusPollingId());
-                break;
-            case 3 :
-                clearInterval(this.globalStorageService.getPrepareSitePollingId());
-                clearInterval(this.globalStorageService.getBackupStatusPollingId());
-                clearInterval(this.globalStorageService.getRestoreStatusPollingId());
-                break;
-            case 4 :
-                clearInterval(this.globalStorageService.getPrepareSitePollingId());
-                clearInterval(this.globalStorageService.getBackupStatusPollingId());
-                clearInterval(this.globalStorageService.getUpgradeStatusPollingId());
-            break;
-        }
-
+        this.selectedTile = val;
     }
 
 }

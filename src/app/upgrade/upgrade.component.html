@@ -1,43 +1,55 @@
 <body>
+        <div *ngIf="isDataAvailable">
 <div class="pull-right">
-    <button [disabled]="!selectedTurbinesForUpgrade.length" type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#upgradeConfirmationBox" id="upgrade-button" value="upgrade"><i class="fa fa-arrow-circle-up fa-lg"></i> Upgrade</button>
+    <button [disabled]="!tickedTurbinesForUpgrade.size" type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#upgradeConfirmationBox" id="upgrade-button" value="upgrade"><i class="fa fa-arrow-circle-up fa-lg"></i> Upgrade</button>
 </div>
 
-<div class="container-fluid m-t-sm"  style='float:left;width:100%'>
+<div id="upgrade-table" class="container-fluid m-t-sm"  style='float:left;width:100%'>
 <ngx-datatable
+    id="upgrade-table"
     style="width: 100%"
     class="material"
     [rows]="ngxRows"
-    [columnMode]="standard" 
+    [columnMode]="force"
     [headerHeight]="50"
     [footerHeight]="50"
     [rowHeight]="'auto'"
     [limit]="10"
     [columns] = "columns"
-    [selectionType]="'checkbox'"
-    (select)='onCheckboxChange($event)'>
-    <ngx-datatable-column [width]=10 prop="spinner" name=""></ngx-datatable-column>
-        <ngx-datatable-column
-        [width]="30"
-        [sortable]="false"
-        [canAutoResize]="false"
-        [draggable]="false"
-        [resizeable]="false"
-        [headerCheckboxable]="true"
-        [checkboxable]="true">
+    [selectionType]="'checkbox'">
+        <ngx-datatable-column prop="checkbox" name="" [width]="30">
+            <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                <div *ngIf="!row.turbineInProcessMap.get('isUpgradeInProcess'); else spinnerBlock">
+                    <input [checked]="(row.turbineInProcessMap.get('isBackupInProcess') || row.turbineInProcessMap.get('isRestoreInProcess')) ? false : ''" [disabled]= "(row.turbineInProcessMap.get('isBackupInProcess') || row.turbineInProcessMap.get('isRestoreInProcess'))" type="checkbox" class="pointer" name="{{row.systemNumber}}" (change)="onCheckboxChange($event)"/>
+                </div>
+                <ng-template #spinnerBlock>
+                    <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                </ng-template>
+            </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column [width]=110 prop="name" name="Name"></ngx-datatable-column>
-        <ngx-datatable-column [width]=125 prop="systemNumber" name="Sys. Number"></ngx-datatable-column>
-        <ngx-datatable-column [width]=125 prop="ipAddress" name="IP"></ngx-datatable-column>
-        <ngx-datatable-column [width]=125 prop="turbineStatus" name="Turbine Status"></ngx-datatable-column>
-        <ngx-datatable-column [width]=125 prop="swVersion" name="Current Ver."></ngx-datatable-column>
-        <ngx-datatable-column [width]=100 prop="ramSize" name="RAM Size"></ngx-datatable-column>
-        <ngx-datatable-column [width]=125 prop="cfc0Size" name="Total CFC0 Size"></ngx-datatable-column>
-        <ngx-datatable-column [width]=125 prop="taskVersion" name="Backup Ver."></ngx-datatable-column>
-        <ngx-datatable-column [width]=125 prop="lastTaskRunTime" name="Upgrade Time"></ngx-datatable-column>
-        <ngx-datatable-column [width]=110 prop="progress" name="Upgrade Status"></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="name" name="Name">
+            <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
+                <b>{{value}}</b>
+                <!-- <span class="badge badge-primary" ngbTooltip={{value}} placement="right">{{value}}</span> -->
+            </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="systemNumber" name="Sys. Number"></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="ipAddress" name="IP"></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="turbineStatus" name="Turbine Status"></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="swVersion" name="Current Ver."></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="ramSize" name="RAM Size (MB)"></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="cfc0Size" name="Total CFC0 Size (MB)"></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="lastTaskRunTime" name="Upgrade Time"></ngx-datatable-column>
+        <ngx-datatable-column [flexGrow]=".5" prop="progress" name="Upgrade Status">
+        </ngx-datatable-column>
     </ngx-datatable>
 </div>
+</div>
+<div *ngIf="!isDataAvailable" style="text-align: center;">
+        <p>
+            &nbsp;&nbsp; Please prepare site first for the turbines which needs to be upgraded
+        </p>
+    </div>
 </body>
 
 
@@ -49,7 +61,7 @@
           <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
         </div>
         <div class="modal-body">
-          Are you sure you want to upgrade <b>{{selectedTurbinesForUpgrade.length}}</b> selected turbine(s)?
+          Are you sure you want to upgrade selected turbine(s)?
 
         </div>
         <div class="modal-footer">
@@ -58,4 +70,4 @@
         </div>
       </div>
     </div>
-</div>  
+</div>

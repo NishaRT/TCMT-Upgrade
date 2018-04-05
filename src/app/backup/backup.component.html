@@ -1,62 +1,61 @@
 <body>
+    <div *ngIf="isDataAvailable">
     <div class="pull-right">
         <!--{{isBackupButtonEnabled}}-->
-        <button [disabled]="!selectedTurbinesForBackup.length" type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#backupConfirmationBox" id="backup-button" value="backup"><i class="fa fa-arrow-circle-up fa-lg"></i> Backup</button>
+        <button [disabled]="!tickedTurbinesForBackup.size" type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#backupConfirmationBox" id="backup-button" value="backup"><i class="fa fa-arrow-circle-up fa-lg"></i> Backup</button>
     </div>
-    
+
     <div class="container-fluid m-t-sm"  style='float:left;width:100%'>
         <ngx-datatable
+        id="backup-table"
         style="width: 100%"
         class="material"
         [rows]="ngxRows"
-        [columnMode]="standard" 
+        [columnMode]="standard"
         [headerHeight]="50"
         [footerHeight]="50"
         [rowHeight]="'auto'"
         [limit]="10"
         [columns] = "columns"
-        [selectionType]="'checkbox'"
-        (select)='onCheckboxChange($event)'>
-        <ngx-datatable-column [width]="10" prop="spinner" name=""></ngx-datatable-column>
-            <ngx-datatable-column
-            [width]="30"
-            [sortable]="false"
-            [canAutoResize]="false"
-            [draggable]="false"
-            [resizeable]="false"
-            [headerCheckboxable]="true"
-            [checkboxable]="true">
+        [selectionType]="'checkbox'">
+            <ngx-datatable-column [width]="30" prop="checkbox" name="">
+                <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+                    <div *ngIf="!row.turbineInProcessMap.get('isBackupInProcess'); else spinnerBlock">
+                        <input [checked]="(row.turbineInProcessMap.get('isUpgradeInProcess') || row.turbineInProcessMap.get('isRestoreInProcess')) ? false : ''" [disabled]= "row.turbineInProcessMap.get('isUpgradeInProcess') || row.turbineInProcessMap.get('isRestoreInProcess')" type="checkbox" class="pointer" name="{{row.systemNumber}}"  (change)="onCheckboxChange($event)"/>
+
+                    </div>
+                    <!-- [disabled]="row.processMap.get(row.systemNumber).get('isGetTurbineInfoInProcess')" {{row}} - {{row.processMap | json}} - {{row.processMap.get(row.systemNumber).get('isGetTurbineInfoInProcess')}} -->
+                    <ng-template #spinnerBlock>
+                        <i class="fa fa-spinner fa-pulse fa-fw"></i>
+                    </ng-template>
+                </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column [width]=110 prop="name" name="Name"></ngx-datatable-column>
-            <ngx-datatable-column [width]=125 prop="systemNumber" name="Sys. Number"></ngx-datatable-column>
-            <ngx-datatable-column [width]=125 prop="ipAddress" name="IP">
+            <ngx-datatable-column [width]=110 prop="name" name="Name">
                 <ng-template ngx-datatable-cell-template let-rowIndex="rowIndex" let-value="value" let-row="row">
-                    <span
-                      title="Double click to edit"
-                      (dblclick)="editing[rowIndex + '-ipAddress'] = true"
-                      *ngIf="!editing[rowIndex + '-ipAddress']">
-                      {{value}}
-                    </span>
-                    <input
-                      autofocus
-                      (blur)="updateViaInline($event, 'ipAddress', rowIndex)"
-                      *ngIf="editing[rowIndex+ '-ipAddress']"
-                      type="text"
-                      [value]="value"
-                    />
-                  </ng-template>
+                    <b>{{value}}</b>
+                    <!-- <span class="badge badge-primary" ngbTooltip={{value}} placement="right">{{value}}</span> -->
+                </ng-template>
             </ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="systemNumber" name="Sys. Number"></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="ipAddress" name="IP"></ngx-datatable-column>
             <ngx-datatable-column [width]=125 prop="turbineStatus" name="Turbine Status"></ngx-datatable-column>
             <ngx-datatable-column [width]=125 prop="swVersion" name="Current Ver."></ngx-datatable-column>
-            <ngx-datatable-column [width]=100 prop="ramSize" name="RAM Size"></ngx-datatable-column>
-            <ngx-datatable-column [width]=125 prop="cfc0Size" name="Total CFC0 Size"></ngx-datatable-column>
+            <ngx-datatable-column [width]=100 prop="ramSize" name="RAM Size (MB)"></ngx-datatable-column>
+            <ngx-datatable-column [width]=125 prop="cfc0Size" name="Total CFC0 Size (MB)"></ngx-datatable-column>
             <ngx-datatable-column [width]=125 prop="taskVersion" name="Backup Ver."></ngx-datatable-column>
             <ngx-datatable-column [width]=125 prop="lastTaskRunTime" name="Backup Time"></ngx-datatable-column>
-            <ngx-datatable-column [width]=100 prop="progress" name="Backup Status"></ngx-datatable-column>
+            <ngx-datatable-column [width]=150 prop="progress" name="Backup Status"></ngx-datatable-column>
         </ngx-datatable>
     </div>
+</div>
+
+<div *ngIf="!isDataAvailable" style="text-align: center;">
+    <p>
+        &nbsp;&nbsp; Please prepare site first for the turbines which needs to be upgraded
+    </p>
+</div>
 </body>
-    
+
 
 <div class="modal fade" id="backupConfirmationBox" tabindex="-1" role="dialog" aria-labelledby="backupConfirmationBoxLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -65,7 +64,7 @@
           <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
         </div>
         <div class="modal-body">
-          Are you sure you want to backup <b>{{selectedTurbinesForBackup.length}}</b> selected turbine(s)?
+          Are you sure you want to backup selected turbine(s)?
 
         </div>
         <div class="modal-footer">
@@ -74,6 +73,4 @@
         </div>
       </div>
     </div>
-</div>  
-    
-    
+</div>

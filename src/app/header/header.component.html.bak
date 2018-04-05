@@ -1,0 +1,41 @@
+<div class="col-xs-12 col-sm-12 col-md-12 header">
+    <div class="col-xs-12 col-sm-2 col-md-12 header-logo">
+        <div class="row" style="display: flex; align-items:center;">
+            <img class="float-left" src="../../assets/img/GE_logo_white.png" />
+            <div style="font-size: 20px;">Turbine Configuration Management</div>
+            <sup> (1.0)</sup>
+            <div style="flex:1; display: flex; justify-content: flex-end; align-items:center;margin-right:10px;">
+                <!-- <span class="welcome">Welcome, </span> -->
+                <i class="fa fa-user"></i>
+                <span class="username">User</span>
+                <!-- <span class="role">(Administrator)</span> -->
+
+
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-xs-12 col-sm-12 col-md-12 userLoginInfo" style="display:flex;align-items:center;">
+                <!-- <button type="button" id="sidebarCollapse" style="padding:3px 20px;font-size:10px;" class="btn btn-outline-secondary float-left"
+                    (click)="onOpenSideBarClick()"> -->
+                <i class="fa fa-bars" id="sidebarCollapse" style="font-size:18px;margin:0px 15px 0px 15px;" (click)="onOpenSideBarClick()"></i>
+                <div style="display: inline-block; font-size: 14px;">Adelaide</div>
+
+                <select #langSelect class="form-control form-control-sm" style="width:75px;height:18px;margin-left:10px;" (change)="localeChanged(langSelect.value)">
+                    <option *ngFor="let lang of locales" [value]="lang.text">{{lang.text}}</option>
+                </select>
+                <label class="switch" style="margin: 0px">
+                        <input #themeSelector type="checkbox" (change)="themeChanged(themeSelector.checked)" checked=true>
+                        <span class="slider round"></span>
+                      </label>
+
+                <!-- </button> -->
+
+                <div class="float-right" style="margin-left: 10px;flex:1">
+                    <span class="float-right info">{{servertime| date:'MM/dd/yy hh:mm:ss a'}} </span>
+                </div>
+
+            </div>
+        </div>

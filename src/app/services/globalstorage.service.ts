@@ -43,13 +43,17 @@ export class GlobalStorageService {
     upgradeStatusPollingId;
     retsoreStatusPollingId;
 
+
     accessToken;
 
     listOfFarms;
 
+    retryCountForGlobalPolling;
+
     selectedParkId;
 
     selectedParkName;
+    selectedTurbinesForTreeView=[];
 
     listOfAcceptedCommandStatus = [0,1];
 
@@ -57,17 +61,27 @@ export class GlobalStorageService {
 
     turbineTypeWiseMap = {};
 
-    processResponseArray = [];
-
     private mapOfTurbines; // To be filled
 
     private mapOfprocessResponseArray;
 
     mapOfTurbineStatuses = new Map();
 
+    pollBucketForTurbines = new Map();
+
+    activeTurbineProcessListMap = new Map();
+
+    activeTurbineMap = new Map();
+
+    failedTurbineMap = new Map();
+
+    turbineCountMapForTurbineInfo = new Map();
+
+    timeOutFlagOfGlobalPolling = false;
+
     private allTurbineInProcessMap;
 
-    isProdEnvironment;
+    needGRData;
 
     userInfo;
 
@@ -76,6 +90,11 @@ export class GlobalStorageService {
     private errorTypesMap;
 
     private generalConfigurationsMap;
+
+    private isProductionEnvironment = true;
+
+    //Symbols
+    exclamationTriangle = '<i class="fa fa-exclamation-triangle error-color m-t-xs" aria-hidden="true"></i>';
 
     setAccessToken(val: string) {
         this.accessToken = val;
@@ -104,6 +123,9 @@ export class GlobalStorageService {
     getSelectedParkId(){
         return this.selectedParkId;
     }
+    // setAllTurbines(val){
+    //   //console.log("GlobalSe")
+    // }
 
     setSelectedParkName(val){
         this.selectedParkName = val;
@@ -113,15 +135,31 @@ export class GlobalStorageService {
     getSelectedParkName(){
         return this.selectedParkName;
     }
+    setSelectedTurbinesForTreeView(val){
+      console.log("set the turbines for tree view",val);
+      this.selectedTurbinesForTreeView = val;
 
-    setListOfTurbines(val, emitEvent) {
+      // for(var i=0; i>val.length; i++){
+      //   this.selectedTurbinesForTreeView.push({"Turbinename":val[i].name});
+      // }
+      // console.log("Global-Storage-service",this.selectedTurbinesForTreeView);
+
+
+    }
+    getSelectedTurbinesForTreeView(){
+      return this.selectedTurbinesForTreeView;
+    }
+
+    setListOfTurbines(val) {
         this.listOfTurbines = val;
-        if(emitEvent){
-            this.eventsService.listOfTurbinesEmitter.next(val);
-        }
-        if(val) {
-            var mapOfTurbines = new Map(val.map((i) => [i.systemNumber, i]));
-            this.setMapOfTurbines(mapOfTurbines, emitEvent);
+        var mapOfTurbines = new Map();
+        if(this.listOfTurbines) {
+            for(var i=0; i<this.listOfTurbines.length; i++){
+                var turbineObject = this.listOfTurbines[i];
+                turbineObject.systemNumber = turbineObject.systemNumber.toString(); //Converting to string when integer is present - since axis contains systemNumber as string
+                mapOfTurbines.set(turbineObject.systemNumber, turbineObject);
+            }
+            this.setMapOfTurbines(mapOfTurbines);
         }
       }
 
@@ -134,7 +172,6 @@ export class GlobalStorageService {
     }
 
     setSelectedTile(val) {
-      console.log("inside SetSelectedTIle--globlaservice",val);
         this.selectedTile = val;
         this.eventsService.selectedTileEmitter.next(val);
         return this.selectedTile;
@@ -150,25 +187,9 @@ export class GlobalStorageService {
         return this.turbineTypeWiseMap;
     }
 
-    setProcessResponseArray(val) {
-        this.processResponseArray = val;
-        this.eventsService.processResponseEmitter.next(val);
-        if(val) {
-            var mapOfprocessResponseArray = new Map(val.map((i) => [i.systemNumber, i]));
-            this.setMapOfprocessResponseArray(mapOfprocessResponseArray);
-        }
-        return this.processResponseArray;
-    }
-
-    getProcessResponseArray() {
-        return this.processResponseArray;
-    }
-
-    setMapOfTurbines(val, emitEvent){
+    setMapOfTurbines(val){
         this.mapOfTurbines = val;
-        if(emitEvent){
-            this.eventsService.mapOfTurbinesEmitter.next(val);
-        }
+        this.eventsService.mapOfTurbinesEmitter.next(val);
     }
 
     getMapOfTurbines(){
@@ -209,6 +230,7 @@ export class GlobalStorageService {
 
     setUserInfo(val) {
         this.userInfo = val;
+        this.eventsService.userInfoEmitter.next(this.userInfo);
         return this.userInfo;
     }
     getUserInfo(){
@@ -221,6 +243,7 @@ export class GlobalStorageService {
         return this.timesMap;
     }
     getTimesMap(){
+      console.log("Inside getTimesMap ---GlobalService");
         return this.timesMap;
     }
 
@@ -234,18 +257,20 @@ export class GlobalStorageService {
     }
 
     setAllTurbineInProcessMap(val) {
-
-        this.listOfTurbines = val;
-        if(val) {
-            var processMap=new Map();
-            processMap.set("isGetTurbineInfoInProcess",true );
-            processMap.set("isBackupInProcess",false );
-            processMap.set("isUpgradeInProcess",false );
-            processMap.set("isRestoreInProcess",false );
-            processMap.set("isTurbineInProcess",true );
-            this.allTurbineInProcessMap = new Map(val.map((i) => [i.systemNumber, processMap]));
+        this.allTurbineInProcessMap = new Map();
+        if(val){
+            for(var i=0; i<val.length; i++) {
+                var processMap = new Map();
+                processMap.set("isGetFilesInFolderInProcess", false);
+                processMap.set("isPushToSiteInProcess", false);
+                processMap.set("isGetTurbineInfoInProcess",false );
+                processMap.set("isTurbineInProcess",false );
+                processMap.set("isBackupInProcess",false );
+                processMap.set("isUpgradeInProcess",false );
+                processMap.set("isRestoreInProcess",false );
+                this.allTurbineInProcessMap.set((val[i].systemNumber.toString()), processMap); //Converting to string to maintain consistency with GR Data
+            }
         }
-
         return this.allTurbineInProcessMap;
     }
 
@@ -253,8 +278,9 @@ export class GlobalStorageService {
         return this.allTurbineInProcessMap;
     }
 
-    setTurbineInProcessMapValue(systemNumber, processName, porcessValue) {
-        this.allTurbineInProcessMap.get(systemNumber).set(processName, porcessValue);
+    setTurbineInProcessMapValue(systemNumber, processName, processValue) {
+        var turbineProcessMap = this.allTurbineInProcessMap.get(systemNumber);
+        turbineProcessMap.set(processName, processValue);
         if(this.allTurbineInProcessMap.get(systemNumber).get("isGetTurbineInfoInProcess")===true ||
         this.allTurbineInProcessMap.get(systemNumber).get("isBackupInProcess")===true ||
         this.allTurbineInProcessMap.get(systemNumber).get("isUpgradeInProcess")===true ||
@@ -267,7 +293,7 @@ export class GlobalStorageService {
     }
 
     getTurbineInProcessMapValue(systemNumber, processName) {
-        return this.allTurbineInProcessMap.get(systemNumber).get(processName);
+        return this.allTurbineInProcessMap.get(systemNumber.toString()).get(processName);
     }
 
     setMapOfprocessResponseArray(val){
@@ -278,16 +304,77 @@ export class GlobalStorageService {
         return this.mapOfprocessResponseArray;
     }
 
-    addTurbineListOfTurbines(val) {
-
-    }
-
     setGeneralConfigurationsMap(val){
         this.generalConfigurationsMap = val;
-        this.isProdEnvironment = this.generalConfigurationsMap.get("isProductionEnvironment");
+        this.needGRData = this.generalConfigurationsMap.get("needGRData");
         return this.generalConfigurationsMap;
     }
     getGeneralConfigurationsMap(){
         return this.generalConfigurationsMap;
     }
+
+    getUrl() {
+        if(window.location.hostname.indexOf("localhost") > -1 || window.location.hostname.indexOf("127.0.0.1") > -1){
+            return "http://localhost:5000/";
+        } else {
+            return "/";
+        }
+    }
+
+    setPollBucketForTurbines(val){
+        this.pollBucketForTurbines = val;
+    }
+
+    getPollBucketForTurbines(){
+        return this.pollBucketForTurbines;
+    }
+
+    setActiveTurbineProcessListMap(val){
+        this.activeTurbineProcessListMap = val;
+    }
+
+    getActiveTurbineProcessListMap(){
+        return this.activeTurbineProcessListMap;
+    }
+
+    setFailedTurbineMap(val){
+        this.failedTurbineMap = val;
+    }
+
+    getFailedTurbineMap(){
+        return this.failedTurbineMap;
+    }
+
+    setTurbineCountMapForTurbineInfo(val){
+        this.turbineCountMapForTurbineInfo = val;
+    }
+
+    getTurbineCountMapForTurbineInfo(){
+        return this.turbineCountMapForTurbineInfo;
+    }
+
+    setActiveTurbineMap(val){
+        this.activeTurbineMap = val;
+    }
+
+    getActiveTurbineMap(){
+        return this.activeTurbineMap;
+    }
+
+    setTimeOutFlagOfGlobalPolling(val){
+        this.timeOutFlagOfGlobalPolling = val;
+    }
+
+    getTimeOutFlagOfGlobalPolling(){
+        return this.timeOutFlagOfGlobalPolling;
+    }
+
+    setRetryCountForGlobalPolling(val){
+        this.retryCountForGlobalPolling = val;
+    }
+
+    getRetryCountForGlobalPolling(){
+        return this.retryCountForGlobalPolling;
+    }
+
 }

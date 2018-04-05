@@ -1,0 +1,28 @@
+<div>
+<button type="button" class="btn turbinsSelectionBtn" (click)="openTurbineDialog()" data-toggle="modal" data-target="#turbinesModal">Select Turbine</button>
+<div id="turbinesModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+<div class="modal-content">
+      <div class="modal-header">
+        <h5>Select Turbines</h5>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+
+          <div>
+          <input type="checkbox" id="Selectall" (click)="selectAll()"><span>Select All</span>
+        </div>
+        <div  *ngFor='let turbine of turbinesData'style="margin-top:5px">
+          <span style="float:left"><input  type="checkbox" (change)="singleSelect(turbine, $event.target.checked)"><span>{{turbine.systemNumber}}</span></span>&nbsp;&nbsp;
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="getSelectedTurbines()">OK</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+  </div>

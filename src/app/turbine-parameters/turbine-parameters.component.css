@@ -1,0 +1,11 @@
+.turbineSelection{
+  float:left;
+  margin-left:-450px;
+
+}
+.turbinsSelectionBtn{
+  border: solid 1px grey;
+  background-color: #ffffff;
+  width:280px;
+  margin-top:6px
+}

@@ -9,24 +9,32 @@ import { Symbol } from 'rxjs';
 @Injectable()
 export class EventsService {
     selectedTileEmitter;
-    listOfTurbinesEmitter;
     turbineTypeWiseInfoEmitter;
     processResponseEmitter;
     mapOfTurbinesEmitter;
     errorEmitter;
-    getVariableStatusWithTimeStampEmitter;
     stopSpinnersEventEmitter;
     confirmationEmitter;
+    processResponseMapEmitter;
+    globalPollingFunctionEmitter;
+    globalPollingFuctionSleepEmitter;
+    globalPollingStopFlagEmitter;
+    siteChangeEmitter;
+    userInfoEmitter;
 
     constructor() {
-        this.listOfTurbinesEmitter = new BehaviorSubject(undefined);
         this.selectedTileEmitter = new BehaviorSubject(1);
-        this.turbineTypeWiseInfoEmitter = new BehaviorSubject({});
+        this.turbineTypeWiseInfoEmitter = new Subject();
         this.processResponseEmitter = new BehaviorSubject([]);
+        this.processResponseMapEmitter = new BehaviorSubject(undefined);
+        this.globalPollingFunctionEmitter = new BehaviorSubject(undefined);
         this.mapOfTurbinesEmitter = new BehaviorSubject(undefined);
         this.errorEmitter = new Subject();
-        this.getVariableStatusWithTimeStampEmitter=new BehaviorSubject(undefined);
         this.stopSpinnersEventEmitter = new BehaviorSubject(null);
         this.confirmationEmitter = new Subject();
+        this.globalPollingFuctionSleepEmitter = new BehaviorSubject(undefined);
+        this.siteChangeEmitter = new BehaviorSubject(undefined);
+        this.userInfoEmitter = new Subject();
+        this.globalPollingStopFlagEmitter = new BehaviorSubject(undefined);
     }
 }

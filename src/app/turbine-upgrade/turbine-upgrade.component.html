@@ -1,19 +1,28 @@
+<body>
+<!-- <header-comp></header-comp> -->
 
-<div style="width:100%">
-<div>
-  <div *ngIf="isListOfFarmsAvailable">
-      <sites-component></sites-component>
-      <div *ngIf="listOfTurbines">
-          <tiles-component></tiles-component>
-              <div [style.display]="selectedTile==1? 'block':'none'"><preparesite-component></preparesite-component></div>
-              <div [style.display]="selectedTile==2? 'block':'none'"><backup-component></backup-component></div>
-              <div [style.display]="selectedTile==3? 'block':'none'"><upgrade-component></upgrade-component></div>
-              <div [style.display]="selectedTile==4? 'block':'none'"><restore-component></restore-component></div>
-      </div>
-  </div>
-  <div *ngIf="!isListOfFarmsAvailable">
-      Fetching Sites..
-  </div>
-  </div>
-  <ng-template #dataTableBusy>Fetching Data</ng-template>
+<div class="app">
+<!-- For Tiles -->
+<div *ngIf="isListOfFarmsAvailable">
+    <sites-component></sites-component>
+    <!-- <div *ngIf="mapOfTurbines"> -->
+        <tiles-component></tiles-component>
+            <div [style.display]="selectedTile==1? 'block':'none'"><preparesite-component></preparesite-component></div>
+            <div [style.display]="selectedTile==2? 'block':'none'"><backup-component></backup-component></div>
+            <div [style.display]="selectedTile==3? 'block':'none'"><upgrade-component></upgrade-component></div>
+            <div [style.display]="selectedTile==4? 'block':'none'"><restore-component></restore-component></div>
+    <!-- </div> -->
 </div>
+
+<div class="m-t-lg" *ngIf="!isListOfFarmsAvailable" style="text-align:center;">
+    <i class="fa fa-spinner fa-spin m-t-lg" style="font-size:24px"></i>
+    &nbsp;&nbsp; Fetching Sites..
+</div>
+
+<ng-template #dataTableBusy>Fetching Data</ng-template>
+</div>
+
+<!-- <footer-component></footer-component> -->
+
+<modal-component></modal-component>
+</body>

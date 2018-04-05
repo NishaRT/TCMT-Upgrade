@@ -1,46 +1,34 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>
-    <%= htmlWebpackPlugin.options.title %>
-  </title>
-  <meta name="description" content="<%= htmlWebpackPlugin.options.title %>">
+  <title>TCMT</title>
+  <meta name="description" content="TCMT">
   <!-- base url -->
-  <base href="<%= htmlWebpackPlugin.options.metadata.baseUrl %>">
-  <% if (webpackConfig.htmlElements.headTags) { %>
-    <!-- Configured Head Tags  -->
-    <%= webpackConfig.htmlElements.headTags %>
-      <% } %>
+  <base href="/">
+ 
+  <!-- Async Google Analytics: change UA-71073175-1 to be your site's ID -->
+  <!-- <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-71073175-1', 'auto');
+    ga('send', 'pageview');
+  </script> -->
+  <!-- End Google Analytics -->
 
+  <!-- CSS will be injected by webpack here -->
+  <!-- Preload link tags will be injected by webpack here -->
+  <!-- <link rel="stylesheet" href="css/ng-select.css"> -->
 
-        <%= htmlWebpackPlugin.files.webpackManifest %>
-
-          <% if (htmlWebpackPlugin.options.metadata.isDevServer && htmlWebpackPlugin.options.metadata.HMR !== true) { %>
-            <!-- Webpack Dev Server reload -->
-            <script src="../webpack-dev-server.js"></script>
-            <% } %>
-
-              <!-- Async Google Analytics: change UA-71073175-1 to be your site's ID -->
-              <script>
-                window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
-                ga('create', 'UA-71073175-1', 'auto');
-                ga('send', 'pageview');
-              </script>
-              <script async src="https://www.google-analytics.com/analytics.js"></script>
-                <!-- End Google Analytics -->
-
-              <!-- CSS will be injected by webpack here -->
-              <!-- Preload link tags will be injected by webpack here -->
 
 </head>
 
+
+
 <body style="font-family:Arial; background-color: #102027;;min-height:100vh;padding:0px;margin:0px;">
 
-  <app class="container-fluid" style="display: flex;flex-direction: column; padding:0px; min-height:100vh;">
+  <app> <div class="container-fluid" style="display: flex;flex-direction: column; padding:0px; min-height:100vh;">
     <style>
       #splash {
         margin: auto;
@@ -66,6 +54,7 @@
     <div id="splash">
       <div style="font-size:x-large;line-height: 15vh;;" >Turbine Configuration Management</div>
     </div>
+	</div>
   </app>
 
 

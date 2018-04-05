@@ -1,6 +1,18 @@
-<div class = "m-t-sm container-fluid">
-    Site: <select (change)="selectedSite($event.target)" id="sites-dropdown">
-            <option value="" >Select a Site</option>
-            <option *ngFor="let site of allSites" value={{site.parkId}} id={{site.parkId}}>{{site.parkName}} </option>
-          </select>
+<div class=" row">
+    <div class="col-md-3 m-l-lg m-t-sm">
+        <ng-select [allowClear]="true"
+                    [items]="ng2SelectItems"
+                    [disabled]="fetchingTurbines"
+                    (selected)="onSiteSelect($event)"
+                    placeholder="Select a Site"
+                    id="sites-dropdown">
+        </ng-select>
+    </div>
+    <!-- <div class="m-t-lg" *ngIf="!isListOfFarmsAvailable" style="text-align:center;">
+        <i class="fa fa-spinner fa-spin m-t-lg" style="font-size:24px"></i>
+        &nbsp;&nbsp; Fetching Sites..
+    </div> -->
+    <div  *ngIf="fetchingTurbines" class="col-md-1">
+        <span style="float:left"><i class="fa fa-spinner fa-pulse fa-fw fa-2x m-t-sm"></i></span><span>&nbsp;&nbsp; Fetching Turbines..</span>
+    </div>
 </div>

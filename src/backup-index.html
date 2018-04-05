@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+  <meta name="description" content="<%= htmlWebpackPlugin.options.title %>">
+  <!-- base url -->
+  <base href="<%= htmlWebpackPlugin.options.metadata.baseUrl %>">
+  <% if (webpackConfig.htmlElements.headTags) { %>
+    <!-- Configured Head Tags  -->
+    <%= webpackConfig.htmlElements.headTags %>
+      <% } %>
+
+
+        <%= htmlWebpackPlugin.files.webpackManifest %>
+
+          <% if (htmlWebpackPlugin.options.metadata.isDevServer && htmlWebpackPlugin.options.metadata.HMR !== true) { %>
+            <!-- Webpack Dev Server reload -->
+            <script src="../config/webpack-dev-server.js"></script>
+            <% } %>
+
+              <!-- Async Google Analytics: change UA-71073175-1 to be your site's ID -->
+              <script>
+                window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) }; ga.l = +new Date;
+                ga('create', 'UA-71073175-1', 'auto');
+                ga('send', 'pageview');
+              </script>
+              <script async src="https://www.google-analytics.com/analytics.js"></script>
+                <!-- End Google Analytics -->
+
+              <!-- CSS will be injected by webpack here -->
+              <!-- Preload link tags will be injected by webpack here -->
+
+</head>
+
+<body style="font-family:Arial; background-color: #102027;;min-height:100vh;padding:0px;margin:0px;">
+
+  <app class="container-fluid" style="display: flex;flex-direction: column; padding:0px; min-height:100vh;">
+    <style>
+      #splash {
+        margin: auto;
+        /* margin-top: 150px; */
+        position: relative;
+        top: 30%;
+        width: 74vh;
+        height: 25vh;
+        padding: 18px 56px;
+        /*border: 2px solid #ddd;*/
+        font-size: 1.2em;
+        box-shadow: 0px 0px 50px #ccc;
+        -moz-box-shadow: 0px 0px 50px #ccc;
+        -webkit-box-shadow: 0px 0px 50px #ccc;
+        border-radius: 3px 3px 3px 3px;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        background: url('../assets/img/turbine.gif') no-repeat top right;
+        background-color: #fff;
+        background-size: 50%;
+      }
+    </style>
+    <div id="splash">
+      <div style="font-size:x-large;line-height: 15vh;;" >Turbine Configuration Management</div>
+    </div>
+  </app>
+
+
+  <!-- Scripts will be injected by webpack here -->
+</body>
+
+</html>

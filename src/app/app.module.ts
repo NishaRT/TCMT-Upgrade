@@ -1,7 +1,7 @@
 import { NgModule, LOCALE_ID,APP_INITIALIZER } from '@angular/core';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { BrowserModule} from '@angular/platform-browser';
-//import { Title } from '@angular/platform-browser';
+import { CookieService } from 'ngx-cookie-service';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
@@ -11,6 +11,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 import localeZh from '@angular/common/locales/zh';
+import {SelectModule} from 'ng2-select';
+import { DatePipe } from '@angular/common';
 
 
 import {MatSidenavContainer, MatSidenavModule, MatCheckboxModule} from '@angular/material'
@@ -31,6 +33,7 @@ import {HomeComponent} from './home/home.component';
 
 import * as $ from 'jquery';
 import {NgxDatatableModule} from '@swimlane/ngx-datatable';
+import { TreeviewModule } from 'ngx-treeview';
 
 import 'bootstrap';
 import '../../node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.js';
@@ -48,7 +51,9 @@ import { CanDeactivateService } from 'app/app.canDeactive';
 import { TurbineParametersComponent } from 'app/turbine-parameters/turbine-parameters.component';
 import { TurbineUpgradeComponent } from 'app/turbine-upgrade/turbine-upgrade.component';
 //import { TilesComponent } from './tiles/tiles.component';
+import { TreeViewComponent } from './tree-view/tree-view.component';
 import { SitesComponent } from './sites/sites.component';
+import { TurbinesComponent } from './turbines/turbines.component';
 import { TilesComponent } from './tiles/tiles.component';
 import { PrepareSiteComponent } from './preparesite/preparesite.component';
 import { BackupComponent } from './backup/backup.component';
@@ -56,6 +61,7 @@ import { UpgradeComponent } from './upgrade/upgrade.component';
 import { RestoreComponent } from './restore/restore.component';
 import { FooterComponent} from './footer/footer.component';
 import { Modal } from './modal/modal.component';
+
 //services
 import { GlobalStorageService } from './services/globalstorage.service';
 import { DataService } from './services/data.service';
@@ -139,6 +145,8 @@ registerLocaleData(localeZh, 'zh-Hans');
     TurbineUpgradeComponent,
     TurbineStatusPipe,
     SitesComponent,
+    TurbinesComponent,
+    TreeViewComponent,
     TilesComponent,
     PrepareSiteComponent,
     BackupComponent,
@@ -147,13 +155,13 @@ registerLocaleData(localeZh, 'zh-Hans');
     FooterComponent,
     Modal,
     FilterPipe
-  ],
+    ],
   /**
    * Import Angular's modules.
    */
   imports: [
     BrowserModule,
-    //Title,
+    SelectModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     FormsModule,
@@ -162,6 +170,8 @@ registerLocaleData(localeZh, 'zh-Hans');
     MatSidenavModule,
     MatCheckboxModule,
     NgxDatatableModule,
+    TreeviewModule.forRoot(),
+    NgbModule.forRoot(),
     LocalizationModule.forRoot(l10nConfig),
     LocaleValidationModule.forRoot()
     //   RouterModule.forRoot(ROUTES, {
@@ -198,7 +208,10 @@ registerLocaleData(localeZh, 'zh-Hans');
     DataService,
     EventsService,
     TimesService,
-    GEUtils
+    GEUtils,
+    DatePipe,
+    CookieService
   ]
+
 })
 export class AppModule {}

@@ -1,7 +1,9 @@
-import { Component, ViewEncapsulation, Input} from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import {GlobalStorageService} from '../services/globalstorage.service';
 import {DataService} from '../services/data.service';
-import { Http, Response, RequestOptions } from '@angular/http';
+import { Response, RequestOptions } from '@angular/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
 import { Headers } from '@angular/http';
 import { EventsService } from '../services/events.service';
 import { DatePipe } from '@angular/common';
@@ -17,205 +19,236 @@ import { GEUtils } from '../services/geutils.service';
 })
 
 export class BackupComponent {
-    constructor(private http: Http, private globalStorageService: GlobalStorageService, private dataService: DataService,private eventsService: EventsService, private datePipe : DatePipe, private geUtils : GEUtils) {
-        this.eventsService.mapOfTurbinesEmitter.subscribe(mapOfTurbines => {
-            if (mapOfTurbines) {
-                this.populateTableWithTurbineInfo(mapOfTurbines);
-            }
-        });
+    constructor(private http: HttpClient, private globalStorageService: GlobalStorageService, private dataService: DataService,private eventsService: EventsService, private datePipe : DatePipe, private geUtils : GEUtils) {
 
-        this.eventsService.processResponseEmitter.subscribe(processResponseArray => {
-            if (!!processResponseArray) {
-                this.updateTableWithProcessResponse(null, processResponseArray);
-            }
-        });
+        //Event emitter to display processResponse
+        this.processResponseMapEmitter();
 
-         this.eventsService.selectedTileEmitter.subscribe(selectedTile => {
-             if(selectedTile == 2) {
-                 this.pollBucket = this.globalStorageService.getListOfTurbines();
-                 this.callAndPollBackupStatus(null);
-             }
-            });
+        //Event emitter to initate Backup
+        this.globalPollingFuctionSleepEmitter();
 
-                 //Event emitter to stop spinners in the turbineslist which are in error state
-        this.eventsService.stopSpinnersEventEmitter.subscribe(listOfTurbines => {
-            if(listOfTurbines){
-                var ngxMap = this.geUtils.stopSpinnersForTurbines(listOfTurbines, this.ngxMap);
-                this.refreshDataTableWithMap(ngxMap);
-            }
-        });
+        this.subscribeToselectedTileEmitter();
 
+        // Event emitter to recognized the global polling
+        this.subscribeForStopOfGlobalPollingEmitter();
     }
 
-    selectedTurbinesForBackup = [];
+    pollBucketForBackup = new Map();
+
+    tickedTurbinesForBackup = new Map();
 
     gridLossTag = '<span class="badge badge-danger">Grid Loss</span>';
     onlineTag = '<span class="badge badge-success">Online</span>';
     // editedTextMsg;
     defaultSpinner = this.globalStorageService.defaultSpinner;
-    editing = {};
     ngxRows = [];
-    mapOfTurbines = this.globalStorageService.getMapOfTurbines();
     ngxMap = new Map();
-    pollBucket = [];
     isBackupStatusAlreadyPolling = false;
     isBackupButtonEnabled = false;
-
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ DATA UPDATION CODE BLOCK  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^//
-    private populateTableWithTurbineInfo(mapOfTurbines) {
-        var self = this;
-        mapOfTurbines.forEach(function(value, key) {
-            var systemNumber = key;
-            var turbineObject = value;
-            var turbineDetailsMap = new Map();
-
-            if(turbineObject){
-                turbineDetailsMap.set("spinner", self.defaultSpinner);
-                if(turbineObject.deviceName) {turbineDetailsMap.set("name",turbineObject.deviceName)}// else {turbineDetailsMap.set("name", self.defaultSpinner)}
-                if(turbineObject.systemNumber) {turbineDetailsMap.set("systemNumber",turbineObject.systemNumber)} //else{turbineDetailsMap.set("systemNumber", self.defaultSpinner)}
-                if(turbineObject.ipaddress) {turbineDetailsMap.set("ipAddress",turbineObject.ipaddress)} //else{turbineDetailsMap.set("ipAddress", self.defaultSpinner)}
-                if(turbineObject.turbineStatus) {
-                    turbineObject.turbineStatus == 6.000? turbineDetailsMap.set("turbineStatus",self.gridLossTag) :  turbineDetailsMap.set("turbineStatus",self.onlineTag);
-                } else{
-                    //turbineDetailsMap.set("turbineStatus", self.defaultSpinner);
-                }
-                if(turbineObject.swVersion) {turbineDetailsMap.set("swVersion",turbineObject.swVersion)} //else{turbineDetailsMap.set("swVersion", self.defaultSpinner)}
-                if(turbineObject.ramSize) {turbineDetailsMap.set("ramSize",((turbineObject.ramSize)/(1024*1024)).toFixed(0))} //else{turbineDetailsMap.set("ramSize", self.defaultSpinner)}
-                if(turbineObject.cfc0Size) {turbineDetailsMap.set("cfc0Size",((turbineObject.cfc0Size)/(1024*1024)).toFixed(0))} //else{turbineDetailsMap.set("cfc0Size", self.defaultSpinner)}
-                if(turbineObject.taskVersion) {turbineDetailsMap.set("taskVersion",turbineObject.taskVersion)} //else{turbineDetailsMap.set("taskVersion", self.defaultSpinner)}
-                if(turbineObject.lastTaskRunTime) {turbineDetailsMap.set("lastTaskRunTime",turbineObject.lastTaskRunTime)} //else{turbineDetailsMap.set("lastTaskRunTime", self.defaultSpinner)}
-                if(turbineObject.progress) {turbineDetailsMap.set("progress",turbineObject.progress)} //else{turbineDetailsMap.set("progress", self.defaultSpinner)}
-            }
-            self.ngxMap.set(systemNumber,turbineDetailsMap);
-          });
-        self.refreshDataTableWithMap(self.ngxMap);
-    }
+    isDataAvailable=false;
+    isBackUpInitiated = false;
+    isPollBucketAddingFlag = true;
+    isGlobalPollingStopped = false;
 
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  DATA UPDATION CODE BLOCK vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv//
 
 
     private sendBackupCommand() {
-        this.clearIrrelevantTableData();
-        var listOfTurbinesToBeSent = [];
-        for(var i=0; i<this.selectedTurbinesForBackup.length; i++) {
-            var systemNumber = this.selectedTurbinesForBackup[i].systemNumber;
-            var turbineBean = this.mapOfTurbines.get(systemNumber);
-            turbineBean.ipaddress = this.selectedTurbinesForBackup[i].ipAddress; //Make sure inline edited data is fetched
-            listOfTurbinesToBeSent.push(turbineBean);
-            var turbineRowMap = this.ngxMap.get(systemNumber);
-            turbineRowMap.set("isInProcess", true);
-        }
-        this.disableOrEnableBackupAction();
-        var cmdParams = {"turbineList" : listOfTurbinesToBeSent, "platform" : "DMP"}
-        this.dataService.callPollAndGetResponseWhenSuccess("sendCommand", "SendCommandToEdge", cmdParams, "Backup", null, 1, 1, 5000, this.callAndPollBackupStatus.bind(this));
-    }
-
-    callAndPollBackupStatus(response) {
         var self = this;
-        var turbineList;
-        var cmdParams ;
-        if(response) {
-            cmdParams = JSON.parse(response.json().cmdParams);
-        } else {
-            cmdParams = {"turbineList" : this.pollBucket, "platform" : "DMP"}
-        }
-        this.isBackupStatusAlreadyPolling = true;
-        this.dataService.callPollAndGetResponseWhenSuccess("sendCommand", "SendCommandToEdge", cmdParams, "BackupStatus", true, 1, 1, 5000, this.updateTableWithProcessResponse.bind(this));
+        this.clearIrrelevantTableData();
+        this.isBackUpInitiated = true;
 
-        //Making the turbines "inProcess" in the process map
-        turbineList = cmdParams.turbineList;
-        turbineList.forEach(function(value) {
-            self.globalStorageService.setTurbineInProcessMapValue(value.systemNumber, "isBackupInProcess", true);
-            self.ngxMap.get(value.systemNumber).set("spinner", self.defaultSpinner);
+        this.tickedTurbinesForBackup.forEach(function(value, systemNumber){
+            self.pollBucketForBackup.set(systemNumber, value);
+            self.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", true);
         });
+        self.tickedTurbinesForBackup.clear();
         self.refreshDataTableWithMap(self.ngxMap);
-    }
-
-    onCheckboxChange({ selected } ) {
-        if(selected) {
-            this.selectedTurbinesForBackup = selected;
+        // for Stopped turbines to hit global turbines polling
+        if(this.isGlobalPollingStopped){
+            this.backupCommandInitiatedAfterGlobalPolling();
+            this.eventsService.globalPollingFunctionEmitter.next(true);
         }
-        this.disableOrEnableBackupAction();
     }
 
-    updateViaInline(event, cell, rowIndex) {
-        console.log('inline editing rowIndex', rowIndex)
-        this.editing[rowIndex + '-' + cell] = false;
-        var systemNumber=this.ngxRows[rowIndex]["systemNumber"];
-        if(true || !this.globalStorageService.getTurbineInProcessMapValue(systemNumber,"isTurbineInProcess")){
-            this.ngxRows[rowIndex][cell] = event.target.value;
-            this. updateTurbineDetails(systemNumber,event.target.value);
-        }
-        // }else{
-        //     var tempValue=this.ngxRows[rowIndex][cell];
-        //     this.ngxRows[rowIndex][cell]="Unable to update the Ip address";
-        //     var _this=this;
-        //     setTimeout(function(){_this.ngxRows[rowIndex][cell]=tempValue}, 2000);
-        // }
+    backupCommandInitiatedAfterGlobalPolling(){
+        var self=this;
+        var listOfTurbinesToBeSent = [];
+        this.pollBucketForBackup.forEach(function(value, systemNumber){
+            // var systemNumber = self.pollBucketForBackup.get("systemNumber");
+            var turbineBean = self.globalStorageService.getActiveTurbineMap().get(systemNumber);
+            listOfTurbinesToBeSent.push(turbineBean);
+            self.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", true);
+        });
+        //turbineBean.ipaddress = this.globalStorageService.getMapOfTurbines().get("ipAddress"); //Make sure inline edited data is fetched
+        var cmdParams = {"turbineList" : listOfTurbinesToBeSent, "platform" : "DMP"}
+        this.dataService.callPollAndGetResponseWhenSuccessWithPollingCount("sendCommand", "SendCommandToEdge", cmdParams, "Backup", 1, 1, 5000, this.globalStorageService.getGeneralConfigurationsMap().get("getStatusForSendCmdCount"), this.processSuccessBackUPTurbines.bind(this), this.processFailedBackUPTurbines.bind(this), this.processErrorBackUPTurbines.bind(this));
 
-        this.ngxRows = [...this.ngxRows];
-        console.log('UPDATED!', this.ngxRows[rowIndex][cell]);
     }
 
-    updateTurbineDetails(systemNumber,systemIpaddress){
-        var behaviouralMap=new Map();
-        var turbineArray=[];
-        turbineArray.push(this.mapOfTurbines.get(systemNumber))
-        behaviouralMap.set("listOfTurbines",turbineArray);
-        behaviouralMap.set("isUpdateTurbineRequired",true);
-
-        // Updating the turbine details
-        var turbineDetails=this.mapOfTurbines.get(systemNumber);
-        turbineDetails.ipaddress=systemIpaddress;
-        turbineDetails.variableTimeStamp=undefined;
-
-        // Updating gloabal turbine List
-        var listOfTurbines=Array.from(this.mapOfTurbines.values());
-        this.globalStorageService.setListOfTurbines(listOfTurbines,true);
-
-        // Updating the processResponseArray
-        var processResponseArray= this.globalStorageService.getMapOfprocessResponseArray();
-        processResponseArray.delete(systemNumber);
-        var listOfProcessResponses=Array.from(processResponseArray.values());
-        this.globalStorageService.setProcessResponseArray(listOfProcessResponses);
-
-        // Calling the GetVariableWithTimeStamp and GetTurbineInfo
-        this.eventsService.getVariableStatusWithTimeStampEmitter.next(behaviouralMap);
-    }
-
-    private clearIrrelevantTableData(){
-        var selectedTurbines = this.selectedTurbinesForBackup;
-        for(var i=0; i<selectedTurbines.length; i++) {
-            var turbineIP = selectedTurbines[i].turbineIP;
-            var turbineId = selectedTurbines[i].turbineId;
-            for(var k=0; k<this.ngxRows.length; k++) {
-                //check if this is matching variable names
-                if(turbineIP == this.ngxRows[k].ip) {
-                    this.ngxRows[k].status_message = "-";
-                    this.ngxRows[k].backup_status = "0%";
-                }
-            }
-        }
-        this.ngxRows = [...this.ngxRows];
-    }
-
-
-
-//******************* Upgrade copied Code  ***********//
-    updateTableWithProcessResponse(response , processResponseArray) {
-        var pollAgainForProgress = false;
-        var presentProcess = "isGetTurbineInfoInProcess";
-        if(response){
-            processResponseArray = response.json().cmdResponse.ProcessResponses;
-        	presentProcess = "isBackupInProcess";
-        }
+    processSuccessBackUPTurbines(response) {
+        var processResponseArray = response.cmdResponse.ProcessResponses;
         var ngxMap = this.ngxMap;
         if(processResponseArray  && processResponseArray.length) {
             for(var i=0; i<processResponseArray.length; i++) {
                 var processResponse = processResponseArray[i];
                 var systemNumber = processResponse.systemNumber;
                 var responseData = processResponse.responseData;
+                this.pollBucketForBackup.delete(systemNumber);
                 var turbineRow = ngxMap.get(systemNumber);
+                if(responseData) {
+                    if(turbineRow) {
+                        turbineRow.set("taskVersion","-");
+                        turbineRow.set("lastTaskRunTime", "-");
+                        if(responseData.statusMessage) turbineRow.set("progress", responseData.statusMessage);
+                        if(responseData.statusCode) turbineRow.set("statusCode",responseData.statusCode);
+                        if(responseData.statusCode == "IN_PROGRESS") {
+                             this.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", true);
+                        }
+                        if(responseData.statusCode == "SUCCESS") {
+                            this.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", false);
+                        }
+                        if(responseData.statusCode == "FAILURE") {
+                            if(responseData.statusMessage) turbineRow.set("progress", responseData.statusMessage);
+                            this.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", false);
+                        }
+                        if(responseData.statusMessage) turbineRow.set("statusMessage",responseData.statusMessage);
+
+                    }
+                } else {
+                    if(turbineRow) {
+                        turbineRow.set("taskVersion","-");
+                        turbineRow.set("lastTaskRunTime", "-");
+                        turbineRow.set("progress",{"progress" : "-", "statusMessage" : ""});
+                        this.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", false);
+                    }
+                }
+                ngxMap.set(systemNumber, turbineRow);
+            }
+        }
+        this.refreshDataTableWithMap(ngxMap);
+    }
+
+    // Processing of the failure turbine responses
+    processFailedBackUPTurbines(response) {
+        var self = this;
+        var ngxMap = this.ngxMap;
+        this.pollBucketForBackup.forEach(function(value, key){
+            var systemNumber = key;
+            var turbineRow = ngxMap.get(systemNumber);
+            if(turbineRow) {
+                turbineRow.set("taskVersion","-");
+                turbineRow.set("lastTaskRunTime", "-");
+                turbineRow.set("progress",{"progress" : "Connection Failed", "statusMessage" : "Nucleus Connection Failed"});
+                turbineRow.set("spinner" , null);
+                self.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", false);
+            }
+            ngxMap.set(systemNumber, turbineRow);
+        });
+        this.pollBucketForBackup.clear();
+        this.refreshDataTableWithMap(ngxMap);
+    }
+
+    processErrorBackUPTurbines(response) {
+
+    }
+
+    processResponseMapEmitter(){
+        this.eventsService.processResponseMapEmitter.subscribe(processResponseMapArray => {
+            if (!!processResponseMapArray) {
+                this.updateTableWithProcessResponse( Array.from(processResponseMapArray.values()));
+            }
+        });
+    };
+
+    globalPollingFuctionSleepEmitter(){
+        this.eventsService.globalPollingFuctionSleepEmitter.subscribe(isGlobalPollingInSleep => {
+            if(isGlobalPollingInSleep){
+                if(this.isBackUpInitiated == true){
+                    this.backupCommandInitiatedAfterGlobalPolling();
+                }
+               this.isBackUpInitiated = false;
+            }
+        });
+    };
+
+    onCheckboxChange(event) {
+        if(event){
+            var checkBox = event.target;
+            var systemNumber = (checkBox.name).toString();
+            if(!checkBox.checked){
+                this.tickedTurbinesForBackup.delete(systemNumber);
+                return;
+            }
+            var sizeOfPollBucket = this.pollBucketForBackup.size;
+            var maxSelectedTurbineCount = this.globalStorageService.getGeneralConfigurationsMap().get("maxTurbinesToBeSelected");
+            if(sizeOfPollBucket <= maxSelectedTurbineCount -1){
+                this.isPollBucketAddingFlag = true;
+            }else {
+                this.isPollBucketAddingFlag = false;
+            }
+            // We can allow download when the size of the poll bucket less than max size and the adding flag is in the false position is Adding Scenario if not failure scenario
+            if( (this.tickedTurbinesForBackup.size > maxSelectedTurbineCount -1) || !( ( this.isPollBucketAddingFlag ) && (sizeOfPollBucket < maxSelectedTurbineCount) ) ){
+                alert("Please select max of " + maxSelectedTurbineCount +" Turbines");
+                checkBox.checked = false;
+            }
+            if(checkBox.checked) {
+                this.tickedTurbinesForBackup.set(systemNumber, this.globalStorageService.getMapOfTurbines().get(systemNumber));
+            } else {
+                this.tickedTurbinesForBackup.delete(systemNumber);
+            }
+            //this.globalStorageService.setSelectedTurbineMap(this.selectedTurbinesMap);
+            console.log(this.tickedTurbinesForBackup.size + " turbines selected");
+        }
+    }
+
+    private clearIrrelevantTableData(){
+        var self = this;
+        var ngxMap = this.ngxMap;
+        this.tickedTurbinesForBackup.forEach(function(value, key){
+            var systemNumber = key;
+            var turbineBean = value;
+            var turbineRow = ngxMap.get(systemNumber);
+            turbineRow.set("taskVersion","-");
+            turbineRow.set("lastTaskRunTime", "-");
+            turbineRow.set("progress",{"progress" : "0" + "%", "statusMessage" : "Initiated"});
+            turbineRow.set("spinner" , self.defaultSpinner);
+            ngxMap.set(systemNumber, turbineRow);
+        });
+        this.refreshDataTableWithMap(ngxMap);
+    }
+
+
+
+//******************* Upgrade copied Code  ***********//
+    updateTableWithProcessResponse(processResponseArray) {
+        var ngxMap = this.ngxMap;
+        if(processResponseArray  && processResponseArray.length) {
+            for(var i=0; i<processResponseArray.length; i++) {
+                var processResponse = processResponseArray[i];
+                var systemNumber = processResponse.systemNumber;
+                var responseDataArray = processResponse.responseData;
+                var processName = null;
+                var responseData = null;
+                if(Array.isArray(responseDataArray) && responseDataArray.length){
+                    var sizeOfArray = responseDataArray.length;
+                    for(i=0; i < sizeOfArray ; i++){
+                        if(responseDataArray[i].taskProcess == "Backup"){
+                            processName = "Backup";
+                            responseData = responseDataArray[i];
+                            break;
+                        }
+                    }
+                }else{
+                    responseData = processResponse.responseData;
+                }
+                var turbineRow = new Map();
+                if(ngxMap.size && ngxMap.get(systemNumber)){
+                    turbineRow = ngxMap.get(systemNumber);
+                }
+                if(processResponse.systemNumber) turbineRow.set("systemNumber",processResponse.systemNumber);
+                if(processResponse.IpAddress) turbineRow.set("ipAddress",processResponse.IpAddress);
+                if(processResponse.DeviceName) turbineRow.set("name",processResponse.DeviceName);
                 if(responseData) {
                     if(turbineRow) {
                         if(responseData.cfc0Size) turbineRow.set("cfc0Size",(((responseData.cfc0Size)/(1024*1024)).toFixed(0)));
@@ -226,23 +259,23 @@ export class BackupComponent {
                         if(responseData.turbineStatus) turbineRow.set("turbineStatus",this.globalStorageService.mapOfTurbineStatuses.get(responseData.turbineStatus) ? this.globalStorageService.mapOfTurbineStatuses.get(responseData.turbineStatus) : responseData.turbineStatus);
                         if(responseData.taskVersion) turbineRow.set("taskVersion",responseData.taskVersion);
                         if(responseData.lastTaskRunTime) turbineRow.set("lastTaskRunTime", this.datePipe.transform(responseData.lastTaskRunTime, "medium"));
-                        if(responseData.progress!=null || responseData.progress!=undefined) turbineRow.set("progress",(responseData.progress).toFixed(0) + " %");
+                        if(responseData.statusMessage) turbineRow.set("progress", responseData.statusMessage);
                         if(responseData.statusCode) turbineRow.set("statusCode",responseData.statusCode);
                         if(responseData.statusCode == "IN_PROGRESS") {
-                             pollAgainForProgress = true;
-                             this.globalStorageService.setTurbineInProcessMapValue(systemNumber, presentProcess, true);
+                             this.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", true);
                         }
-                        if(responseData.statusCode == "SUCCESS") this.globalStorageService.setTurbineInProcessMapValue(systemNumber, presentProcess, false);
-                        if(responseData && presentProcess=="isGetTurbineInfoInProcess") this.globalStorageService.setTurbineInProcessMapValue(systemNumber, presentProcess, false);
+                        if(responseData.statusCode == "SUCCESS") this.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", false);
                         if(responseData.statusMessage) turbineRow.set("statusMessage",responseData.statusMessage);
 
                     }
                 } else {
                     if(turbineRow) {
-                        turbineRow.set("taskVersion","-");
-                        turbineRow.set("lastTaskRunTime", "-");
-                        turbineRow.set("progress","-");
-                        this.globalStorageService.setTurbineInProcessMapValue(systemNumber, presentProcess, false);
+                        if(processName == "Backup"){
+                            turbineRow.set("taskVersion","-");
+                            turbineRow.set("lastTaskRunTime", "-");
+                            turbineRow.set("progress",{"progress" : "-", "statusMessage" : ""});
+                            // this.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", false);
+                        }
                     }
                 }
                 if(this.globalStorageService.getTurbineInProcessMapValue(systemNumber, "isTurbineInProcess")){
@@ -253,11 +286,11 @@ export class BackupComponent {
                 ngxMap.set(systemNumber, turbineRow);
             }
         }
-
-        this.refreshDataTableWithMap(ngxMap);
-        if(pollAgainForProgress) {
-            this.callAndPollBackupStatus(response);
+        if(!this.isBackUpInitiated){
+            this.refreshDataTableWithMap(ngxMap);
         }
+        this.isDataAvailable = true;
+
     }
 
     //Refreshes enitre data table with whatever data is given - Given Map is the end data//
@@ -278,22 +311,77 @@ export class BackupComponent {
             var taskVersion = turbineObject.get("taskVersion");
             var lastTaskRunTime = turbineObject.get("lastTaskRunTime");
             var progress = turbineObject.get("progress");
-            var singleRow = {"spinner" : spinner, "name": name,"systemNumber" : systemNumber, "ipAddress" : ipAddress, "turbineStatus": turbineStatus, "swVersion":swVersion, "ramSize" : ramSize, "cfc0Size":cfc0Size,"taskVersion":taskVersion,"lastTaskRunTime":lastTaskRunTime, "progress":progress};
+            var turbineInProcessMap = self.globalStorageService.getAllTurbineInProcessMap().get(systemNumber.toString());
+            var singleRow = {"turbineInProcessMap" : turbineInProcessMap, "spinner" : spinner, "name": name,"systemNumber" : systemNumber, "ipAddress" : ipAddress, "turbineStatus": turbineStatus, "swVersion":swVersion, "ramSize" : ramSize, "cfc0Size":cfc0Size,"taskVersion":taskVersion,"lastTaskRunTime":lastTaskRunTime, "progress":progress};
             self.ngxRows.push(singleRow);
         });
 
         self.ngxRows = [...self.ngxRows];
     }
 
-    private disableOrEnableBackupAction() {
-        var selected = this.selectedTurbinesForBackup;
-        for(var selectedTurbine of selected){
-            var turbineRow = this.ngxMap.get(selectedTurbine.systemNumber);
-            if(turbineRow.get("isInProcess")){
-                this.isBackupButtonEnabled = false;
-                return;
+
+    //Emitters and its subscription
+    private subscribeToGlobalPollingFunctionSleepEmitter(){
+        this.eventsService.globalPollingFuctionSleepEmitter.subscribe(isGlobalPollingInSleep => {
+            if(isGlobalPollingInSleep){
+                if(this.isBackUpInitiated == true){
+                    this.backupCommandInitiatedAfterGlobalPolling();
+                }
+               this.isBackUpInitiated = false;
             }
-        }
-        this.isBackupButtonEnabled = true;
+        });
     }
+
+    private subscribeToProcessResponse(){
+        this.eventsService.processResponseMapEmitter.subscribe(processResponseMapArray => {
+            if (!!processResponseMapArray) {
+                this.updateTableWithProcessResponse( Array.from(processResponseMapArray.values()));
+            }
+        });
+    }
+
+    private subscribeToselectedTileEmitter(){
+        var self = this;
+        this.eventsService.selectedTileEmitter.subscribe(selectedTile => {
+            if(selectedTile == 2){
+                var turbineInProcessMap = self.globalStorageService.getAllTurbineInProcessMap();
+                var activeTurbineMap = self.globalStorageService.getActiveTurbineMap();
+                if(activeTurbineMap.size){
+                    activeTurbineMap.forEach(function(value, systemNumber){
+                        if(turbineInProcessMap.get(systemNumber).get("isUpgradeInProcess") || turbineInProcessMap.get(systemNumber).get("isRestoreInProcess")) {
+                            self.tickedTurbinesForBackup.delete(systemNumber);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public subscribeForStopOfGlobalPollingEmitter(){
+        this.eventsService.globalPollingStopFlagEmitter.subscribe( isPollingFlagStopped => {
+            if (isPollingFlagStopped) {
+                this.isGlobalPollingStopped = true;
+                this.updateActiveTurbinesWithErrorMessage();
+            }
+        });
+    }
+
+    public updateActiveTurbinesWithErrorMessage(){
+        var self = this;
+        var ngxMap = this.ngxMap;
+        this.globalStorageService.getActiveTurbineMap().forEach(function(value, key){
+            var systemNumber = key;
+            var turbineRow = ngxMap.get(systemNumber);
+            if(turbineRow) {
+                turbineRow.set("taskVersion","-");
+                turbineRow.set("lastTaskRunTime", "-");
+                turbineRow.set("progress",{"progress" : "Unable to get status", "statusMessage" : "Nucleus Connection Failed"});
+                turbineRow.set("spinner" , null);
+                self.globalStorageService.setTurbineInProcessMapValue(systemNumber, "isBackupInProcess", false);
+            }
+            ngxMap.set(systemNumber, turbineRow);
+        });
+        this.refreshDataTableWithMap(ngxMap);
+    }
+
 }

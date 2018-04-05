@@ -1,0 +1,8 @@
+{
+  "/backend/*": {
+    "target": "https://ren-digital-tcmt-uaa-svc.run.aws-usw02-pr.ice.predix.io",
+    "secure": false,
+    "changeOrigin":true,
+    "logLevel": "debug"
+  }
+}

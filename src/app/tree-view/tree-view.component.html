@@ -1,0 +1,59 @@
+<div style="padding-top:20px" class="container-fluid">
+<div style="vertical-align:top; margin-left:20px;overflow:auto;float:left" class="treeBox treeOuterDiv">
+  <div style="margin-left:10px;font-weight: bold;font:size:14px"><span>{{selectedSiteName}}</span></div>
+  <div *ngFor="let turbine of turbinesForTree" style="margin-left:15px;font-weight: bold;font-size:10px">
+  <span>{{turbine.name}}</span>
+  </div>
+  </div>
+  <div class="container-fluid m-t-sm" id="parameterTable" style="vertical-align:top; margin-left:220px;width:80%">
+    <!-- <ngx-datatable
+    id="turbines-parameters-table"
+    style="width: 100%"
+    class="material"
+    [rows]="ngxRowsForTurbineParameters"
+    [columnMode]="'standard'"
+    [headerHeight]="50"
+    [rowHeight]="'auto'"
+    [messages] = "fileTableMessages"
+    [limit]="5"
+    [columns] = "columns"
+    [displayCheck]="displayCheck"
+    [selectionType]="'checkbox'">
+    </ngx-datatable> -->
+
+    <ngx-datatable  id="parameter-table" [rows]="rows"  [columns]="columns">
+    <ngx-datatable-column [flexGrow]=".5" prop="name" name="Name"></ngx-datatable-column>
+    <ngx-datatable-column [flexGrow]=".5" prop="systemNumber" name="System Number"></ngx-datatable-column>
+    <ngx-datatable-column [flexGrow]=".5" prop="ipAddress" name="Ip Address"></ngx-datatable-column>
+    <ngx-datatable-column [flexGrow]=".5" prop="platform" name="Platform"></ngx-datatable-column>
+  </ngx-datatable>
+  </div>
+</div>
+
+
+<!-- <div>
+</div> -->
+<!-- <div style="vertical-align:top; margin-left:20px;margin-top:20px;overflow:auto;float:left" class="treeBox treeOuterDiv">
+   <div style="margin-left:10px;font-weight: bold;font:size:14px"><span>{{selectedSiteName}}</span></div>
+  <div *ngFor="let turbine of turbinesForTree" style="margin-left:15px;font-weight: bold;font-size:10px">
+   <span>{{turbine.name}}</span>
+ </div>
+ </div>
+ <!-- <ngx-treeview
+    [config]="config"
+    [items]="items"
+    (selectedChange)="onSelectedChange($event)">
+</ngx-treeview> -->
+<!--<div style="margin-left:180px;margin-top:20px;" class="treeBox">
+ <div *ngIf="isPLMDataLoading">
+   <div><i class="fa fa-spinner fa-pulse fa-fw fa-2x m-t-sm"></i></div>
+</div>
+<div style="vertical-align:top; margin-left:20px;margin-top:20px;">
+  <ngx-datatable  id="parameter-table" [rows]="rows"  [columns]="columns">
+  <!-- <ngx-datatable-column [flexGrow]=".5" prop="name" name="Name"></ngx-datatable-column>
+  <ngx-datatable-column [flexGrow]=".5" prop="systemNumber" name="System Number"></ngx-datatable-column>
+  <ngx-datatable-column [flexGrow]=".5" prop="ipAddress" name="Ip Address"></ngx-datatable-column>
+  <ngx-datatable-column [flexGrow]=".5" prop="platform" name="Platform"></ngx-datatable-column> -->
+<!--</ngx-datatable>
+</div>
+</div> -->

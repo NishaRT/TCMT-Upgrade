@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Http } from '@angular/http';
 import 'rxjs/add/operator/catch';
 import { GlobalStorageService } from './globalstorage.service';
+import { HttpClient } from '@angular/common/http';
 
 
 
@@ -12,19 +12,22 @@ export class TimesService{
     timesMap = new Map();
     errorMessagesMap = new Map();
 
-    constructor(private http: Http, private globalStorageService : GlobalStorageService) {
+    constructor(private http: HttpClient, private globalStorageService : GlobalStorageService) {
         this.getTimeOutConfigurationsFromFile();
         this.getErrorMessagesFromFile();
         this.getGeneralConfigurationsFromFile();
     }
 
      public getIntervalForId(val){
+       console.log("Inside timeService");
         var interval;
         var timesMap = this.globalStorageService.getTimesMap();
+        console.log("------Time Map-----",timesMap);
         if(timesMap.get(val)){
             interval = timesMap.get(val).get("interval");
         } else {
-            interval = timesMap.get("default").get("interval");
+            //interval = timesMap.get("default").get("interval");
+            interval = 3000;
         }
         return interval;
     }
@@ -36,32 +39,38 @@ export class TimesService{
         }
 
         if(!timeOut){
-          timeOut =  this.globalStorageService.getTimesMap().get("default").get("timeOut");
+          //timeOut =  this.globalStorageService.getTimesMap().get("default").get("timeOut");
+              timeOut       = 180000;
         }
 
         return timeOut;
       }
 
     private getTimeOutConfigurationsFromFile(){
-    var self = this;
-    self.http.get("assets/timeConfigurations.json").map((res:any) => res.json()).subscribe(
-        configurations => {
-            for(var i=0; i<configurations.length; i++) {
-                var detailsMap = new Map();
-                var commandObj = configurations[i];
-                detailsMap.set("timeOut", commandObj.timeOut);
-                detailsMap.set("interval", commandObj.interval);
-                self.timesMap.set(commandObj.id, detailsMap);
-            }
-            self.globalStorageService.setTimesMap(self.timesMap);
-        },
-        error => console.log(error)
-    );
-    }
+        var self = this;
+        self.http.get("assets/timeConfigurations.json",{responseType : "json"}).subscribe(
+            configurations => {
+                for (var configuration in configurations) {
+                    var detailedMap = new Map();
+                    if (configurations.hasOwnProperty(configuration)) {
+                        var details = configurations[configuration];
+                        for (var detail in details) {
+                            if (details.hasOwnProperty(detail)) {
+                                detailedMap.set(detail,details[detail]);
+                            }
+                        }
+                        self.timesMap.set(configuration,detailedMap);
+                    }
+                }
+                self.globalStorageService.setTimesMap(self.timesMap);
+            },
+            error => console.log("Error in timeConfigurations.json file " + error.error)
+        );
+        }
 
     private getErrorMessagesFromFile(){
     var self = this;
-    self.http.get("assets/errorMessages.json").map((res:any) => res.json()).subscribe(
+    self.http.get("assets/errorMessages.json").map((res:any) => res).subscribe(
         errorMessagesJSON => {
             for (var errorType in errorMessagesJSON) {
                 var detailedMap = new Map();
@@ -84,7 +93,7 @@ export class TimesService{
     private getGeneralConfigurationsFromFile(){
     var self = this;
     var generalConfigurationsMap = new Map();
-    self.http.get("assets/generalConfigurations.json").map((res:any) => res.json()).subscribe(
+    self.http.get("assets/generalConfigurations.json").map((res:any) => res).subscribe(
         generalConfigurations => {
             for (var configurations in generalConfigurations) {
                 if (generalConfigurations.hasOwnProperty(configurations)) {
@@ -97,10 +106,4 @@ export class TimesService{
     );
     }
 
-    public getErrorMessage(key, isTimeout){
-        var errorTypesMap = this.globalStorageService.getErrorTypesMap();
-        var errorMessagesMap = isTimeout ? errorTypesMap.get("timeOutMessages") : errorTypesMap.get("errorCodeMessages");
-        var errorMessageText = errorMessagesMap.get(key);
-        return errorMessageText;
-    }
 }

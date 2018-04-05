@@ -1,0 +1,86 @@
+<div class="container-fluid">
+    <hr class="divider">
+    <ul class="nav m-b-md" id="pills-tab" role="tablist">
+
+
+        <li class="nav-item col-lg-3" (click)="onTileSelect(1)">
+            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home"  ><div class="tab-head text-white bg-blue" id="prepare-site-tab">
+                <div class="inner-container">
+                    <div class="row">
+                        <div class="col-md-4 icon-container p-t-sm"><i class="fa fa-wrench fa-2x"></i></div>
+                            <div class="col-md-8">
+                                <div class="pull-left text-container p-t-sm">
+                                    <h6>Prepare Site</h6>
+                                    <p class="quick-info"><br></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>
+
+
+        <li class="nav-item col-lg-3" (click)="onTileSelect(2)">
+            <a class="nav-link" id="pills-backup-tab" data-toggle="pill" href="#pills-backup"><div class="tab-head text-white bg-blue">
+                <div class="inner-container">
+                    <div class="row">
+                        <div class="col-md-4 icon-container p-t-sm"><i class="fa fa-floppy-o fa-2x"></i></div>
+                            <div class="col-md-8">
+                                <div class="pull-left text-container p-t-sm">
+                                    <h6>Backup</h6>
+                                    <p class="quick-info"><br></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>
+
+<!-- ______________________________________________________________________________ -->
+
+
+        <li class="nav-item col-lg-3" (click)="onTileSelect(3)">
+            <a class="nav-link" id="pills-upgrade-tab" data-toggle="pill" href="#pills-upgrade"  ><div class="tab-head text-white bg-blue">
+                <div class="inner-container">
+                    <div class="row">
+                        <div class="col-md-4 icon-container p-t-sm"><i class="fa fa-arrow-circle-up fa-2x"></i></div>
+                        <div class="col-md-8">
+                            <div class="pull-left text-container p-t-sm">
+                                <h6>Upgrade</h6>
+                                <p class="quick-info"><br></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div></a>
+        </li>
+
+
+
+
+        <li class="nav-item col-lg-3" (click)="onTileSelect(4)">
+            <a class="nav-link" id="pills-restore-tab" data-toggle="pill" href="#pills-restore" >
+                <div class="tab-head text-white bg-blue">
+                <div class="inner-container">
+                    <div class="row">
+                        <div class="col-md-4 icon-container p-t-sm"><i class="fa fa-history fa-2x"></i></div>
+                            <div class="col-md-8">
+                                <div class="pull-left text-container p-t-sm">
+                                    <h6>Restore</h6>
+                                    <p class="quick-info"><br></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>
+
+
+
+    </ul>
+
+    <hr class="divider">
+</div>
