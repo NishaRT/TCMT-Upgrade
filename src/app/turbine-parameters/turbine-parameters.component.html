@@ -7,13 +7,14 @@
   <!-- <div *ngIf="!isListOfFarmsAvailable">
       Fetching Sites..
   </div> -->
-  <div *ngIf="isListOfFarmsAvailable" style="float:left;margin-left: 10px;margin-top:10px;background-color:#ffffff;width:98.5%;height:50px">
-  <div  style="float:left;width:90%;margin-top:-3px" >
+  <div *ngIf="isListOfFarmsAvailable">
+    <div style="background-color:#ffffff;width:98.5%;height:50px;margin-left:10px">
+  <div  style="float:left;width:90%;margin-top:-3px;" >
    <sites-component></sites-component>
   </div>
     <div *ngIf="isListOfTurbinesAvailable" class="turbineSelection">
 <!-- Adding this as removing turbines component -->
-<div>
+
 <button type="button" class="btn turbinsSelectionBtn" data-toggle="modal" data-target="#turbinesModal">Select Turbine</button>
 <div id="turbinesModal" class="modal fade" role="dialog">
   <div class="modal-dialog" style="max-width:1050px">
@@ -31,7 +32,8 @@
         <div *ngFor='let turbine of siteRowWiseTurbineModels'style="margin-top:5px">
         <div *ngFor='let item of turbine.rowObject'>
           <div style="float:left">
-          <input class="checkBoxClass" type="checkbox" id={{item.id}} name="{{item.rowName}}" value="{{item.id}}" on-click="onCheckBoxSelect">{{item.id}}
+          <input name={{item.rowName}} type="checkbox" id={{item.systemNumber}} value={{item.id}} on-click="onCheckBoxSelect($event)">{{item.id}}
+
         </div>
         <div style="float:left">
           <span>{{item.systemNumber}}</span>
@@ -43,7 +45,7 @@
 
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="getSelectedTurbines()" disabled>OK</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" (click)="getSelectedTurbines()" >OK</button>
       </div>
     </div>
 
@@ -51,12 +53,13 @@
 </div>
   </div>
     <!-- <turbines-component></turbines-component> -->
-  </div>
+</div>
 
 </div>
-<div *ngIf="isSelectedTurbinesAvailable" style="margin-left: 10px;background-color:#ffffff;width:98.5%;height:80%">
+<div *ngIf="isSelectedTurbinesAvailable" style="margin-left: 10px;background-color:#ffffff;width:98.5%;height:400px">
 <div style="margin-left:10px;margin-top:20px">
 <tree-view></tree-view>
+</div>
 </div>
 </div>
 </div>

@@ -137,7 +137,10 @@ export class GlobalStorageService {
     }
     setSelectedTurbinesForTreeView(val){
       console.log("set the turbines for tree view",val);
-      this.selectedTurbinesForTreeView = val;
+      for(var i=0; i<val.length; i++){
+        this.selectedTurbinesForTreeView.push({"name":val[i]});
+      }
+      //this.selectedTurbinesForTreeView = val;
 
       // for(var i=0; i>val.length; i++){
       //   this.selectedTurbinesForTreeView.push({"Turbinename":val[i].name});

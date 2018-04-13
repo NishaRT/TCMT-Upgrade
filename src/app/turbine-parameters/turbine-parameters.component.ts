@@ -28,6 +28,8 @@ export class TurbineParametersComponent extends IComponent implements OnInit {
     isSelectedTurbinesAvailable = false;
     siteRowWiseTurbineModels=[];
     ischeckBoxSelected =false;
+    listOfSelectedTurbinesForTree =[];
+    rowCheckboxName;
 
   //  isListOfTurbinesAvailable = true;
     public selectedSystem: any;
@@ -108,33 +110,15 @@ export class TurbineParametersComponent extends IComponent implements OnInit {
         var cmdResponse = response.cmdResponse;
         this.globalStorageService.setListOfFarms(cmdResponse.listOfParks);
         this.isListOfFarmsAvailable = true;
-      //  this.isSiteSelected = true;
-      //  this.getListofWindTurbines();
+
     }
-    // siteSelectionUpdated(){
-    //   console.log("Inside updateSiteSelection");
-    //   this.selectedSiteId = this.globalStorageService.getSelectedParkId();
-    //   console.log("selected Site",this.selectedSiteId);
-    //   this.selectedSiteName =this.globalStorageService.getSelectedParkName();
-    //   console.log("selected Site Name",this.selectedSiteName);
-    //
-    // }
-    // turbineSelection(val){
-    //   console.log("inside turbineSelection",val);
-    //   this.isListOfTurbinesAvailable = true;
-    //   for (var i=0; i>val.length; i++){
-    //     this.listOfTurbines.push({"name":val[i].systemNumber,"platform":val[i].platform,"deviceName":val[i].deviceName,"ipAddress":val[i].ipaddress});
-    //   }
-    //   console.log("Turbines List",this.listOfTurbines);
-    // }
+
     slectedTurbinesForTree(){
       console.log("inside slectedTurbinesForTree")
     //  this.isSelectedTurbinesAvailable = true;
     }
 
-    getSelectedTurbines(){
-      console.log("Turbine selection is completed");
-    }
+
 
 
 
@@ -163,123 +147,138 @@ export class TurbineParametersComponent extends IComponent implements OnInit {
         return Math.floor(Math.random() * (1 + top - bottom)) + bottom;
     }
     subscribeToSiteChangeEmitter(){
-      console.log("inside subscribeToSiteChangeEmitter --- Turbine_paramter");
+      //console.log("inside subscribeToSiteChangeEmitter --- Turbine_paramter");
         this.eventsService.siteChangeEmitter.subscribe( isSiteChanged => {
             if(isSiteChanged) {
-              console.log("Inside if isSiteChanged");
               var siteId = this.globalStorageService.getSelectedParkId();
               var siteName = this.globalStorageService.getSelectedParkName();
-              //console.log("The SiteId is",siteId);
-            //  console.log("Ths SiteNmae is",siteName);
               this.loadingTurbineList = true;
               var turbinesList = this.globalStorageService.getListOfTurbines;
-            //  console.log("LISSSTttt",turbinesList);
-              this.slectedTurbinesForTree();
-                //this.callAndPollGetDownloadFileStatus(null);
-                //this.ngxRowsForTurbineTypes = [];
-                //this.ngxRowsForTurbines = [];
-                // if(this.ngxMapForTurbines){
-                //     this.ngxMapForTurbines.clear();
-                // }
+                this.slectedTurbinesForTree();
+
             }
         });
     }
-    onCheckBoxSelect(){
-      console.log("Inside onCheckBoxSelect");
+
+    onCheckBoxSelect(e){
+      console.log("Inside onCheckBoxSelect",e);
+      var selectedValue=e.target.value;
+      console.log("SelectedValue",selectedValue);
+      if(e.target.checked == false){
+      //  console.log()
+        var allCheckboxes = document.getElementsByTagName('input');
+        for (var i = 0; i < allCheckboxes.length; i++){
+          if(allCheckboxes[i].id == "Selectall"){
+            allCheckboxes[i].checked = false;
+          }
+        }
+        }
+        console.log("inside else-----checked");
+          if(selectedValue.indexOf('Row')>=0){
+         console.log("Row Element",selectedValue);
+         //var allRowElement = document.getElementsByTagName('input[name="'+selectedValue
+         var allRowElement = document.getElementsByTagName('input');
+         console.log("allRowEelement",allRowElement);
+         for(var i=0 ; i<allRowElement.length; i++){
+            if(allRowElement[i].name == selectedValue){
+              console.log("Inside if-----2");
+              allRowElement[i].checked = true;
+            }
+            else{
+              console.log("inside else",e);
+              var tempCheckboxName = e.target.name;
+              console.log("-----for Element",tempCheckboxName);
+            }
+
+         }
+
+       }
+    //    }
+
+
     }
     selectAllTurbines(val){
-      console.log("select all",val);
-      var allCheckboxes = document.getElementsByTagName('input');
+        var allCheckboxes = document.getElementsByTagName('input');
         for (var i = 0; i < allCheckboxes.length; i++){
-            if(val == true){
+              if(val == true){
            allCheckboxes[i].checked = true;
+
          }
          else{
             allCheckboxes[i].checked = false;
          }
 
       }
-
-      // if(val == true){
-      //   var selecteditem = document.querySelectorAll('input[type="checkbox"]');
-      //   for(var i=0; i<selecteditem.length; i++){
-      //     console.log("----",selectedElement[i]);
-      //     selecteditem[i].HTMLSelectElement = true;
-      //   }
-      // }
-      // else{
-      //   var selecteditem = document.querySelectorAll('input[type="checkbox"]');
-      //   for(var i=0; i<selecteditem.length; i++){
-      //     console.log("----",selecteditem[i]);
-      //     selecteditem[i].HTMLSelectElement = false;
-      //   }
-      // }
-
-          // console.log("Element",selectedElement);
-          // for(var i=0; i<selectedElement.length; i++){
-          //   console.log("----",selectedElement[i]);
-          //   //selectedElement[i].attributes.checked = true;
-          // }
+    //  this.checkOkButtonStatus();
 
     }
+
+    getSelectedTurbines(){
+    var allCheckboxes = document.getElementsByTagName('input');
+      for (var i = 0; i < allCheckboxes.length; i++){
+        if(allCheckboxes[i].id == "Selectall" && allCheckboxes[i].id == null || allCheckboxes[i].id == "" ){
+            //  console.log("Im row Element or Select All");
+            }
+            else{
+          if(allCheckboxes[i].checked == true){
+          //  console.log("Turbine to be added",allCheckboxes[i].id);
+            this.listOfSelectedTurbinesForTree.push(allCheckboxes[i].id);
+          }
+        }
+
+
+      }
+      this.isSelectedTurbinesAvailable =true;
+      this.globalStorageService.setSelectedTurbinesForTreeView(this.listOfSelectedTurbinesForTree);
+    //  console.log("Turbine for Tree View",this.listOfSelectedTurbinesForTree);
+    }
     subscribeMapOfTurbinesEmitter(){
-      console.log("Inside subscribeMapOfTurbinesEmitter --Turbines--Parameter-COmponent");
-        this.eventsService.mapOfTurbinesEmitter.subscribe(mapOfTurbines => {
+            this.eventsService.mapOfTurbinesEmitter.subscribe(mapOfTurbines => {
             if(mapOfTurbines){
               this.isListOfTurbinesAvailable =true;
               var turbineList = this.globalStorageService.getListOfTurbines();
-              //console.log("------",turbineList);
-              //this.siteRowWiseTurbineModels = turbineList;
               var quotient=turbineList.length / 10;
               var loopCount=Math.floor(quotient);
               var nextIterStart=0;
               var rowObject=[];
-              var rowCheckboxName;
+
+
               for(var j=1;j<=loopCount;j++){
-              var row=[];
-              row.push({"name":"Row "+j,"id":"Row "+j,"arrayIndex":j});
-              rowCheckboxName="Row "+j;
-              //console.log("rowCheckboxName",rowCheckboxName);
+                console.log("Inside loopCOunt");
+            var row=[];
+            row.push({"name":"Row "+j,"id":"Row "+j,"arrayIndex":j});
+            this.rowCheckboxName="Row "+j;
+            console.log(this.rowCheckboxName);
 
-              for(var k=nextIterStart;k<(j*10);k++){
-                var element=turbineList[k]
-                //element['arrayIndex']=k;
-                element['rowName']=rowCheckboxName;
-                //element['checkedStatus']=self.checkedItem;
-                row.push(element);
-              }
-              rowObject.push({"rowObject":row});
-              nextIterStart=k;
+            for(var k=nextIterStart;k<(j*10);k++){
+              var element=turbineList[k]
+              element['rowName']=this.rowCheckboxName;
+            row.push(element);
             }
-            if(loopCount<quotient){
-         var row=[];
-         row.push({"name":"Row "+(loopCount+1),"id":"Row "+(loopCount+1),"arrayIndex":(loopCount+1)});
-         //console.log("row",row)
-         rowCheckboxName=row[0].name;
-         //rowCheckboxName=row;
-         for(var j=(loopCount*10);j<turbineList.length;j++){
-           var element=turbineList[j];
-           //element['arrayIndex']=j;
-           element['rowName']="Row "+(loopCount+1);
-           //element['checkedStatus']=self.checkedItem;
-           //console.log(JSON.stringify(element));
-           row.push(element);
-         }
-         rowObject.push({"rowObject":row});
-       }
-
-      this.siteRowWiseTurbineModels=rowObject;
-      console.log(this.siteRowWiseTurbineModels);
-      //console.log(JSON.stringify(this.siteRowWiseTurbineModels));
-
+            rowObject.push({"rowObject":row});
+            nextIterStart=k;
+          }
+          if(loopCount<quotient){
+            console.log("Inside quotient");
+      var row=[];
+      row.push({"name":"Row "+(loopCount+1),"id":"Row "+(loopCount+1),"arrayIndex":(loopCount+1)});
+      console.log("row it is",row);
+      this.rowCheckboxName="Row "+(loopCount+1);
+      for(var j=(loopCount*10);j<turbineList.length;j++){
+        var element=turbineList[j];
+        element['rowName']="Row "+(loopCount+1);
+        row.push(element);
+      }
+      rowObject.push({"rowObject":row});
+    }
+    this.siteRowWiseTurbineModels=rowObject;
+            console.log(this.siteRowWiseTurbineModels);
+          //  console.log(JSON.stringify(this.siteRowWiseTurbineModels));
 
 
+}
 
 
-
-                //this.populateTurbineTypesTableAndCallGetFiles(mapOfTurbines);
-                //this.populateTurbineDetailsTable(mapOfTurbines);
-            }
         });
     }
     private getStaticListOfFarms(){

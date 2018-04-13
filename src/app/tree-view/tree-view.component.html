@@ -5,55 +5,66 @@
   <span>{{turbine.name}}</span>
   </div>
   </div>
+   <div style="float:right;margin-right:34px;margin-top:-10px;margin-bottom:4px">
+    <button type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#confirmationBox" id="uploadBtn" value="Upload"  (click)="openDialogBox($event)"><i class="fa fa-arrow-circle-up fa-lg"></i>Upload</button>
+    <button type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#confirmationBox" id="downloadBtn" value="Download"  (click)="openDialogBox($event)"><i class="fa fa-arrow-circle-up fa-lg"></i>Download</button>
+    <button type="button" class="btn btn-dark btn-sm m-r-md" data-toggle="modal" data-target="#confirmationBox" id="restoreBtn" value="Restore" (click)="openDialogBox($event)"><i class="fa fa-history fa-lg"></i>Restore</button>
+  </div>
+  <!-- <div style="float-right">
+  </div> -->
+  <div class="modal fade" id="confirmationBox"  tabindex="-1" role="dialog" aria-labelledby="upgradeConfirmationBoxLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+          </div>
+          <div class="modal-body">
+            {{messageData}}
+
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="sendCommand($event)">OK</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+  </div>
   <div class="container-fluid m-t-sm" id="parameterTable" style="vertical-align:top; margin-left:220px;width:80%">
-    <!-- <ngx-datatable
-    id="turbines-parameters-table"
-    style="width: 100%"
+
+
+
+  <ngx-datatable
+    #pxSiteTable
+    style="width: 100%;max-height:320px;overflow:auto"
     class="material"
-    [rows]="ngxRowsForTurbineParameters"
-    [columnMode]="'standard'"
+    [rows]="tableRows"
+    [columnMode]="force"
     [headerHeight]="50"
+    [footerHeight]="50"
     [rowHeight]="'auto'"
-    [messages] = "fileTableMessages"
     [limit]="5"
     [columns] = "columns"
-    [displayCheck]="displayCheck"
     [selectionType]="'checkbox'">
-    </ngx-datatable> -->
+     <ngx-datatable-column prop="checkbox" name="Select" [width]="50">
+       <ng-template ngx-datatable-cell-template let-value="value" let-row="row">
+           <input  type="checkbox" class="pointer" name="{{row.systemNumber}}"  (change)="onCheckboxChange($event)"/>
 
-    <ngx-datatable  id="parameter-table" [rows]="rows"  [columns]="columns">
-    <ngx-datatable-column [flexGrow]=".5" prop="name" name="Name"></ngx-datatable-column>
-    <ngx-datatable-column [flexGrow]=".5" prop="systemNumber" name="System Number"></ngx-datatable-column>
-    <ngx-datatable-column [flexGrow]=".5" prop="ipAddress" name="Ip Address"></ngx-datatable-column>
-    <ngx-datatable-column [flexGrow]=".5" prop="platform" name="Platform"></ngx-datatable-column>
+           <!-- [disabled]="row.processMap.get(row.systemNumber).get('isGetTurbineInfoInProcess')" {{row}} - {{row.processMap | json}} - {{row.processMap.get(row.systemNumber).get('isGetTurbineInfoInProcess')}} -->
+           <!-- <ng-template #spinnerBlock>
+               <i class="fa fa-spinner fa-pulse fa-fw"></i>
+           </ng-template> -->
+       </ng-template>
+     </ngx-datatable-column>
+    <ngx-datatable-column [width]="250" [flexGrow]=".5" prop="systemNumber" name="System Number"></ngx-datatable-column>
+    <ngx-datatable-column [width]="250" [flexGrow]=".5" prop="ipAddress" name="IP Address"></ngx-datatable-column>
+    <ngx-datatable-column [width]="250" [flexGrow]=".5" prop="deviceName" name="Device Name"></ngx-datatable-column>
+    <ngx-datatable-column [width]="250" [flexGrow]=".5" name="Status">
+    <ng-template ngx-datatable-cell-template id="statusIcon">
+      <div *ngIf= "!uploadReq" id="uploadIcon"><span>Upload</span><span class=""></span></div>
+    </ng-template>
+    </ngx-datatable-column>
   </ngx-datatable>
+
+
   </div>
 </div>
-
-
-<!-- <div>
-</div> -->
-<!-- <div style="vertical-align:top; margin-left:20px;margin-top:20px;overflow:auto;float:left" class="treeBox treeOuterDiv">
-   <div style="margin-left:10px;font-weight: bold;font:size:14px"><span>{{selectedSiteName}}</span></div>
-  <div *ngFor="let turbine of turbinesForTree" style="margin-left:15px;font-weight: bold;font-size:10px">
-   <span>{{turbine.name}}</span>
- </div>
- </div>
- <!-- <ngx-treeview
-    [config]="config"
-    [items]="items"
-    (selectedChange)="onSelectedChange($event)">
-</ngx-treeview> -->
-<!--<div style="margin-left:180px;margin-top:20px;" class="treeBox">
- <div *ngIf="isPLMDataLoading">
-   <div><i class="fa fa-spinner fa-pulse fa-fw fa-2x m-t-sm"></i></div>
-</div>
-<div style="vertical-align:top; margin-left:20px;margin-top:20px;">
-  <ngx-datatable  id="parameter-table" [rows]="rows"  [columns]="columns">
-  <!-- <ngx-datatable-column [flexGrow]=".5" prop="name" name="Name"></ngx-datatable-column>
-  <ngx-datatable-column [flexGrow]=".5" prop="systemNumber" name="System Number"></ngx-datatable-column>
-  <ngx-datatable-column [flexGrow]=".5" prop="ipAddress" name="Ip Address"></ngx-datatable-column>
-  <ngx-datatable-column [flexGrow]=".5" prop="platform" name="Platform"></ngx-datatable-column> -->
-<!--</ngx-datatable>
-</div>
-</div> -->
